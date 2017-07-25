@@ -111,7 +111,11 @@ public class Spinney<T> extends AppCompatEditText {
     builder.setTitle(getHint());
     builder.setItems(adapter, new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
-        setText(adapter[selectedIndex]);
+        CharSequence item = adapter[selectedIndex];
+        setText(itemPresenter.getLabelOf(item, selectedIndex));
+
+        if (itemSelectedListener != null)
+          itemSelectedListener.onItemSelected(Spinney.this, (T)item, selectedIndex);
       }
     });
     builder.setPositiveButton("close", null);

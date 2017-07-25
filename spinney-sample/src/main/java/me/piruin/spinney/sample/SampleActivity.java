@@ -27,16 +27,30 @@ import me.piruin.spinney.Spinney;
 
 public class SampleActivity extends AppCompatActivity {
 
-  @BindView(R.id.spinney) Spinney<String> spinney;
+  @BindView(R.id.spinney_normal) Spinney<String> normalSpinney;
+  @BindView(R.id.spinney_searchable) Spinney<String> searchablespinney;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_sample);
     ButterKnife.bind(this);
 
-    spinney.setSearchableAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                                                              new String[] {"NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC"}));
-    spinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
+    searchablespinney.setSearchableAdapter(
+      new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
+                         new String[] {"NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC"}));
+    searchablespinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
+      @Override public void onItemSelected(Spinney view, String selectedItem, int position) {
+        Toast.makeText(SampleActivity.this, selectedItem, Toast.LENGTH_SHORT).show();
+      }
+    });
+
+    normalSpinney.setItems(new String[] {"NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC"});
+    normalSpinney.setItemPresenter(new Spinney.ItemPresenter() {
+      @Override public String getLabelOf(Object item, int position) {
+        return item.toString();
+      }
+    });
+    normalSpinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
       @Override public void onItemSelected(Spinney view, String selectedItem, int position) {
         Toast.makeText(SampleActivity.this, selectedItem, Toast.LENGTH_SHORT).show();
       }
