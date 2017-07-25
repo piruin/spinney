@@ -97,15 +97,10 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   public void setItems(final List<String> items) {
-    CharSequence[] charItems = new CharSequence[items.size()];
-    int i = 0;
-    for (String item : items) {
-      charItems[i++] = item;
-    }
-    setItems(charItems);
+    setItems(items.toArray(new String[items.size()]));
   }
 
-  public void setItems(final CharSequence[] adapter) {
+  public void setItems(final String[] adapter) {
     mode = MODE_NORMAL;
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
     builder.setTitle(getHint());
