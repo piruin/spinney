@@ -20,6 +20,7 @@ package me.piruin.spinney;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
@@ -31,11 +32,21 @@ public class Spinney<T> extends AppCompatEditText {
   public static final int MODE_NORMAL = 1;
   public static final int MODE_SEARCHABLE = 2;
 
-  private SearchableListDialog searchableListDialog;
+  private static ItemPresenter defaultItemPresenter = new ItemPresenter() {
+    @Override public String getLabelOf(Object item, int position) {
+      if (item instanceof String) {
+        return (String)item;
+      } else {
+        return item.toString();
+      }
+    }
+  };
 
+  private SearchableListDialog searchableListDialog;
   private int mode = MODE_NORMAL;
   private AlertDialog alertDialog;
   private OnItemSelectedListener<T> itemSelectedListener;
+  private ItemPresenter itemPresenter = defaultItemPresenter;
 
   public Spinney(Context context) {
     super(context);
@@ -49,6 +60,10 @@ public class Spinney<T> extends AppCompatEditText {
     super(context, attrs, defStyleAttr);
   }
 
+  public static void setDefaultItemPresenter(@NonNull ItemPresenter defaultItemDisplayer) {
+    Spinney.defaultItemPresenter = defaultItemDisplayer;
+  }
+
   public void setSearchableAdapter(final ArrayAdapter<T> adapter) {
     mode = MODE_SEARCHABLE;
 
@@ -58,16 +73,16 @@ public class Spinney<T> extends AppCompatEditText {
       new SearchableListDialog.OnSearchItemClick() {
 
         @Override public void onSearchableItemClicked(Object item, int position) {
-          if (item instanceof String) {
-            setText((String)item);
-          } else {
-            setText(item.toString());
-          }
+          setText(itemPresenter.getLabelOf(item, position));
 
           if (itemSelectedListener != null)
             itemSelectedListener.onItemSelected(Spinney.this, (T)item, position);
         }
       });
+  }
+
+  public void setItemPresenter(@NonNull ItemPresenter itemPresenter) {
+    this.itemPresenter = itemPresenter;
   }
 
   @Override public boolean performClick() {
@@ -116,5 +131,9 @@ public class Spinney<T> extends AppCompatEditText {
   public interface OnItemSelectedListener<T> {
 
     void onItemSelected(Spinney view, T selectedItem, int position);
+  }
+
+  public interface ItemPresenter {
+    String getLabelOf(Object item, int position);
   }
 }

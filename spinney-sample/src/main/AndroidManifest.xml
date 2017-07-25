@@ -3,6 +3,7 @@
   package="me.piruin.spinney.sample">
 
   <application
+    android:name=".SampleApplication"
     android:allowBackup="true"
     android:fullBackupContent="true"
     android:icon="@mipmap/ic_launcher"
