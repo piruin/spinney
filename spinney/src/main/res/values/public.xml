@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <public name="spinney_lib" type="string" />
+
+  <public name="define_Spinney" type="string"/>
+  <public name="library_Spinney_author" type="string"/>
+  <public name="library_Spinney_authorWebsite" type="string"/>
+  <public name="library_Spinney_libraryName" type="string"/>
+  <public name="library_Spinney_libraryDescription" type="string"/>
+  <public name="library_Spinney_libraryVersion" type="string"/>
+  <public name="library_Spinney_libraryWebsite" type="string"/>
+  <public name="library_Spinney_licenseId" type="string"/>
+  <public name="library_Spinney_isOpenSource" type="string"/>
+  <public name="library_Spinney_repositoryLink" type="string"/>
+  <public name="library_Spinney_classPath" type="string"/>
+</resources>

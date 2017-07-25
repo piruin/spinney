@@ -1,0 +1,51 @@
+apply plugin: 'com.android.application'
+
+android {
+  compileSdkVersion ANDROID_TARGET_SDK
+  buildToolsVersion ANDROID_BUILD_TOOLS
+
+  defaultConfig {
+    applicationId "me.piruin.spinney.sample"
+    testApplicationId "me.piruin.spinney.sample.test"
+    minSdkVersion ANDROID_MIN_SDK
+    targetSdkVersion ANDROID_TARGET_SDK
+    versionCode 1
+    versionName version
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+  }
+
+  compileOptions {
+    sourceCompatibility JAVA_VERSION
+    targetCompatibility JAVA_VERSION
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+
+  lintOptions {
+    abortOnError false
+  }
+
+  packagingOptions {
+    exclude 'LICENSE.txt'
+    exclude 'META-INF/DEPENDENCIES'
+    exclude 'META-INF/ASL2.0'
+    exclude 'META-INF/NOTICE'
+    exclude 'META-INF/LICENSE'
+  }
+}
+
+dependencies {
+  def butterKnifeVersion = '8.5.1'
+
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  compile project(':spinney')
+  compile "com.android.support:appcompat-v7:$supportLibVersion"
+  compile "com.android.support:design:$supportLibVersion"
+  compile "com.jakewharton:butterknife:$butterKnifeVersion"
+  annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
+}
