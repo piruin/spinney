@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.Filterable;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -31,10 +31,10 @@ import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 import java.io.Serializable;
 
-public class SearchableListDialog extends Dialog implements OnQueryTextListener, OnCloseListener {
+public class SearchableListDialog extends Dialog implements OnQueryTextListener {
   private ListView listViewItems;
 
-  private OnSearchItemClick searchableItem;
+  private OnItemSelectedListener onItemSelectedListener;
 
   private SearchView searchView;
 
@@ -57,16 +57,14 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener,
     searchView = (SearchView)findViewById(R.id.spinney_search);
     searchView.setIconifiedByDefault(false);
     searchView.setOnQueryTextListener(this);
-    searchView.setOnCloseListener(this);
+    searchView.setOnCloseListener(new OnCloseListener() {
+      @Override public boolean onClose() { return false; }
+    });
     searchView.clearFocus();
   }
 
-  void setOnSearchableItemClickListener(OnSearchItemClick searchableItem) {
-    this.searchableItem = searchableItem;
-  }
-
-  @Override public boolean onClose() {
-    return false;
+  void setOnItemSelectedListener(OnItemSelectedListener searchableItem) {
+    this.onItemSelectedListener = searchableItem;
   }
 
   @Override public boolean onQueryTextSubmit(String query) {
@@ -76,9 +74,9 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener,
 
   @Override public boolean onQueryTextChange(String query) {
     if (TextUtils.isEmpty(query)) {
-      ((ArrayAdapter)listViewItems.getAdapter()).getFilter().filter(null);
+      ((Filterable)listViewItems.getAdapter()).getFilter().filter(null);
     } else {
-      ((ArrayAdapter)listViewItems.getAdapter()).getFilter().filter(query);
+      ((Filterable)listViewItems.getAdapter()).getFilter().filter(query);
     }
     return true;
   }
@@ -89,17 +87,20 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener,
     listViewItems.setTextFilterEnabled(true);
     listViewItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        searchableItem.onSearchableItemClicked(parent.getItemAtPosition(position), position);
-        dismiss();
+        boolean shouldDismiss = onItemSelectedListener.onItemSelected(parent.getItemAtPosition(position), position);
+        if (shouldDismiss)
+          dismiss();
       }
     });
   }
 
-  public interface OnSearchItemClick<T> extends Serializable {
-    void onSearchableItemClicked(T item, int position);
-  }
+  public interface OnItemSelectedListener<T> extends Serializable {
 
-  public interface OnSearchTextChanged {
-    void onSearchTextChanged(String strText);
+    /**
+     * @param item that have been selected
+     * @param position of selected item on list zero-base
+     * @return should dialog close itself or not
+     */
+    boolean onItemSelected(T item, int position);
   }
 }

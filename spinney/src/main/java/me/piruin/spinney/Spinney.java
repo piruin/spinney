@@ -34,31 +34,21 @@ public class Spinney<T> extends AppCompatEditText {
 
   private static ItemPresenter defaultItemPresenter = new ItemPresenter() {
     @Override public String getLabelOf(Object item, int position) {
-      if (item instanceof String) {
-        return (String)item;
-      } else {
-        return item.toString();
-      }
+    return item.toString();
     }
   };
 
   private SearchableListDialog searchableListDialog;
   private int mode = MODE_NORMAL;
   private AlertDialog alertDialog;
-  private OnItemSelectedListener<T> itemSelectedListener;
+  private OnItemSelectedListener itemSelectedListener;
   private ItemPresenter itemPresenter = defaultItemPresenter;
 
-  public Spinney(Context context) {
-    super(context);
-  }
+  public Spinney(Context context) { super(context); }
 
-  public Spinney(Context context, AttributeSet attrs) {
-    super(context, attrs);
-  }
+  public Spinney(Context context, AttributeSet attrs) { super(context, attrs); }
 
-  public Spinney(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-  }
+  public Spinney(Context context, AttributeSet attrs, int defStyleAttr) { super(context, attrs, defStyleAttr); }
 
   public static void setDefaultItemPresenter(@NonNull ItemPresenter defaultItemDisplayer) {
     Spinney.defaultItemPresenter = defaultItemDisplayer;
@@ -69,14 +59,16 @@ public class Spinney<T> extends AppCompatEditText {
 
     searchableListDialog = new SearchableListDialog(getContext());
     searchableListDialog.setAdapter(adapter);
-    searchableListDialog.setOnSearchableItemClickListener(
-      new SearchableListDialog.OnSearchItemClick() {
+    searchableListDialog.setOnItemSelectedListener(
+      new SearchableListDialog.OnItemSelectedListener() {
 
-        @Override public void onSearchableItemClicked(Object item, int position) {
+        @Override
+        public boolean onItemSelected(Object item, int position) {
           setText(itemPresenter.getLabelOf(item, position));
 
           if (itemSelectedListener != null)
             itemSelectedListener.onItemSelected(Spinney.this, (T)item, position);
+          return true;
         }
       });
   }
@@ -123,7 +115,7 @@ public class Spinney<T> extends AppCompatEditText {
     setClickable(true);
   }
 
-  public void setOnItemSelectedListener(OnItemSelectedListener<T> itemSelectedListener) {
+  public void setOnItemSelectedListener(OnItemSelectedListener itemSelectedListener) {
     this.itemSelectedListener = itemSelectedListener;
   }
 
