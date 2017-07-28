@@ -35,7 +35,7 @@ import java.io.Serializable;
  * This dialog use as default dialog for searchable mode of Spinney but it also can use separately
  * as easy as use ordinary dialog
  */
-public class SearchableListDialog extends Dialog implements OnQueryTextListener {
+public class SearchableListDialog extends Dialog {
 
   private OnItemSelectedListener onItemSelectedListener;
 
@@ -48,7 +48,21 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener 
     setContentView(R.layout.searchable_list_dialog);
     searchView = (SearchView) findViewById(R.id.spinney_search);
     searchView.setIconifiedByDefault(false);
-    searchView.setOnQueryTextListener(this);
+    searchView.setOnQueryTextListener(new OnQueryTextListener() {
+      @Override public boolean onQueryTextSubmit(String query) {
+        searchView.clearFocus();
+        return true;
+      }
+
+      @Override public boolean onQueryTextChange(String query) {
+        if (TextUtils.isEmpty(query)) {
+          ((Filterable) listViewItems.getAdapter()).getFilter().filter(null);
+        } else {
+          ((Filterable) listViewItems.getAdapter()).getFilter().filter(query);
+        }
+        return true;
+      }
+    });
     searchView.setOnCloseListener(new OnCloseListener() {
       @Override public boolean onClose() { return false; }
     });
@@ -93,20 +107,6 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener 
    */
   public final void setHint(CharSequence hint) {
     searchView.setQueryHint(hint);
-  }
-
-  @Override public final boolean onQueryTextSubmit(String query) {
-    searchView.clearFocus();
-    return true;
-  }
-
-  @Override public final boolean onQueryTextChange(String query) {
-    if (TextUtils.isEmpty(query)) {
-      ((Filterable) listViewItems.getAdapter()).getFilter().filter(null);
-    } else {
-      ((Filterable) listViewItems.getAdapter()).getFilter().filter(query);
-    }
-    return true;
   }
 
   /**
