@@ -77,7 +77,6 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
   public <K> void updateCondition(K value, Spinney.Condition<T, K> condition) {
     conditionedItem = new ArrayList<>();
     for (T item : originalItems) {
-      System.out.println("filtered " + item.toString());
       if (condition.filter(value, item)) conditionedItem.add(item);
     }
     filteredItem = new ArrayList<>(conditionedItem);

@@ -27,7 +27,10 @@ public class SampleApplication extends Application {
 
     Spinney.setDefaultItemPresenter(new Spinney.ItemPresenter() {
       @Override public String getLabelOf(Object item, int position) {
-        return String.format("%d. %s", position + 1, item.toString());
+        if (item instanceof DatabaseItem)
+          return ((DatabaseItem) item).getName();
+        else
+          return String.format("%s", item.toString());
       }
     });
   }

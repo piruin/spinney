@@ -20,27 +20,62 @@
   android:id="@+id/activity_sample"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:orientation="vertical"
   android:paddingBottom="@dimen/activity_vertical_margin"
   android:paddingLeft="@dimen/activity_horizontal_margin"
   android:paddingRight="@dimen/activity_horizontal_margin"
-  android:paddingTop="@dimen/activity_vertical_margin" android:orientation="vertical"
-  tools:context=".SampleActivity">
+  android:paddingTop="@dimen/activity_vertical_margin"
+  tools:context=".SampleActivity"
+  >
 
-  <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <me.piruin.spinney.Spinney android:id="@+id/spinney_searchable"
-      android:hint="@string/spinney_searchable"
+  <android.support.design.widget.TextInputLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+    <me.piruin.spinney.Spinney
+      android:id="@+id/spinney_searchable"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content" />
+      android:layout_height="wrap_content"
+      android:hint="@string/searchable"
+      />
   </android.support.design.widget.TextInputLayout>
 
-  <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+  <android.support.design.widget.TextInputLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
     <me.piruin.spinney.Spinney
       android:id="@+id/spinney_normal"
-      android:hint="@string/spinney_normal"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content" />
+      android:layout_height="wrap_content"
+      android:hint="@string/normal"
+      />
+  </android.support.design.widget.TextInputLayout>
+
+
+  <android.support.design.widget.TextInputLayout
+    android:layout_marginTop="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+    <me.piruin.spinney.Spinney
+      android:id="@+id/spinney_country"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Country"
+      />
+  </android.support.design.widget.TextInputLayout>
+
+  <android.support.design.widget.TextInputLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+    <me.piruin.spinney.Spinney
+      android:id="@+id/spinney_cities"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Cities"
+      />
   </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

@@ -23,42 +23,71 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import java.util.Arrays;
+import java.util.List;
 import me.piruin.spinney.Spinney;
 import me.piruin.spinney.SpinneyAdapter;
 
 public class SampleActivity extends AppCompatActivity {
 
-  @BindView(R.id.spinney_normal) Spinney<String> normalSpinney;
-  @BindView(R.id.spinney_searchable) Spinney<String> searchablespinney;
+  @BindView(R.id.spinney_searchable) Spinney<String> searchableDept;
+  @BindView(R.id.spinney_normal) Spinney<String> normalDept;
+
+  @BindView(R.id.spinney_country) Spinney<DatabaseItem> countrySpinney;
+  @BindView(R.id.spinney_cities) Spinney<DatabaseItem> citiesSpinney;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_sample);
     ButterKnife.bind(this);
 
-    searchablespinney.setSearchableAdapter(
-      new SpinneyAdapter<>(this, Arrays.asList("NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC")));
-    searchablespinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
-      @Override public void onItemSelected(Spinney view, String selectedItem, int position) {
-        Toast.makeText(SampleActivity.this, selectedItem, Toast.LENGTH_SHORT).show();
-      }
-    });
+    simpleString();
 
-    normalSpinney.setItems(Arrays.asList("NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC"));
-    normalSpinney.setItemPresenter(new Spinney.ItemPresenter() {
+    specifyType();
+  }
+
+  private void simpleString() {
+    List<String> department = Arrays.asList("NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC");
+
+    searchableDept.setSearchableAdapter(
+      new SpinneyAdapter<>(this, department));
+
+    normalDept.setItems(department);
+    normalDept.setItemPresenter(new Spinney.ItemPresenter() {
       @Override public String getLabelOf(Object item, int position) {
         return item.toString();
       }
     });
-    normalSpinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
-      @Override public void onItemSelected(Spinney view, String selectedItem, int position) {
-        Toast.makeText(SampleActivity.this, selectedItem, Toast.LENGTH_SHORT).show();
+  }
+
+  public void specifyType() {
+    List<DatabaseItem> country = Arrays.asList(
+      new DatabaseItem(1, "THAILAND"),
+      new DatabaseItem(2, "JAPAN"),
+      new DatabaseItem(3, "SOUTH KOREA"),
+      new DatabaseItem(4, "VIETNAM"));
+
+    countrySpinney.setSearchableAdapter(new SpinneyAdapter<>(this, country));
+    countrySpinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<DatabaseItem>() {
+      @Override public void onItemSelected(Spinney view, DatabaseItem selectedItem, int position) {
+        Toast.makeText(SampleActivity.this, "Welcome to " + selectedItem.getName(),
+          Toast.LENGTH_SHORT).show();
       }
     });
 
-    normalSpinney.filterBy(searchablespinney, new Spinney.Condition<String, String>() {
-      @Override public boolean filter(String parentItem, String item) {
-        return item.equals(parentItem);
+    List<DatabaseItem> cities = Arrays.asList(
+      new DatabaseItem(1, "BANGKOK", 1),
+      new DatabaseItem(2, "PATTAYA", 1),
+      new DatabaseItem(3, "CHIANG MAI", 1),
+      new DatabaseItem(4, "TOKYO", 2),
+      new DatabaseItem(5, "HOKKAIDO", 2),
+      new DatabaseItem(6, "SEOUL", 3),
+      new DatabaseItem(7, "HOJIMIN", 4)
+    );
+
+    citiesSpinney.setItems(cities);
+    citiesSpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
+      @Override public boolean filter(DatabaseItem parentItem, DatabaseItem item) {
+        return item.getParentId() == parentItem.getId();
       }
     });
   }

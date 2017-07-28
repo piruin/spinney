@@ -1,5 +1,5 @@
 <resources>
   <string name="app_name">Spinney</string>
-  <string name="spinney_searchable">Spinney Searchable</string>
-  <string name="spinney_normal">Spinney Normal</string>
+  <string name="searchable">Searchable</string>
+  <string name="normal">Normal</string>
 </resources>
