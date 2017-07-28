@@ -173,21 +173,17 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /** @return selected item, this may be null */
-  @Nullable public final T getSelectedItem() {
-    return selectedItem;
-  }
+  @Nullable public final T getSelectedItem() { return selectedItem; }
 
   /** @return position of selected item, -1 is nothing select */
-  public final int getSelectedItemPosition() {
-    return adapter.findPositionOf(selectedItem);
-  }
+  public final int getSelectedItemPosition() { return adapter.findPositionOf(selectedItem); }
 
   /**
-   * @param adapter may help if you really need it. By the way, Use with CAUTION!
+   * This getter may help if you really need it. By the way, Use with CAUTION!
+   *
+   * @return SpinneyAdapter currently use by Spinney
    */
-  public final void setAdapter(SpinneyAdapter<T> adapter) {
-    this.adapter = adapter;
-  }
+  public SpinneyAdapter<T> getAdapter() { return adapter; }
 
   /**
    * ItemPresenter to use only on instance of Spinney. Spinney will use global presenter if this not
