@@ -25,6 +25,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Spinney<T> extends AppCompatEditText {
@@ -34,21 +35,24 @@ public class Spinney<T> extends AppCompatEditText {
 
   private static ItemPresenter defaultItemPresenter = new ItemPresenter() {
     @Override public String getLabelOf(Object item, int position) {
-    return item.toString();
+      return item.toString();
     }
   };
 
   private SearchableListDialog searchableListDialog;
   private int mode = MODE_NORMAL;
   private AlertDialog alertDialog;
-  private OnItemSelectedListener itemSelectedListener;
+  private OnItemSelectedListener<T> itemSelectedListener;
   private ItemPresenter itemPresenter = defaultItemPresenter;
+  private T[] items;
 
   public Spinney(Context context) { super(context); }
 
   public Spinney(Context context, AttributeSet attrs) { super(context, attrs); }
 
-  public Spinney(Context context, AttributeSet attrs, int defStyleAttr) { super(context, attrs, defStyleAttr); }
+  public Spinney(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+  }
 
   public static void setDefaultItemPresenter(@NonNull ItemPresenter defaultItemDisplayer) {
     Spinney.defaultItemPresenter = defaultItemDisplayer;
@@ -60,14 +64,14 @@ public class Spinney<T> extends AppCompatEditText {
     searchableListDialog = new SearchableListDialog(getContext());
     searchableListDialog.setAdapter(adapter);
     searchableListDialog.setOnItemSelectedListener(
-      new SearchableListDialog.OnItemSelectedListener() {
+      new SearchableListDialog.OnItemSelectedListener<T>() {
 
         @Override
         public boolean onItemSelected(Object item, int position) {
           setText(itemPresenter.getLabelOf(item, position));
 
           if (itemSelectedListener != null)
-            itemSelectedListener.onItemSelected(Spinney.this, (T)item, position);
+            itemSelectedListener.onItemSelected(Spinney.this, (T) item, position);
           return true;
         }
       });
@@ -88,25 +92,34 @@ public class Spinney<T> extends AppCompatEditText {
     return false;
   }
 
-  public void setItems(final List<String> items) {
-    setItems(items.toArray(new String[items.size()]));
-  }
-
-  public void setItems(final String[] adapter) {
+  public void setItems(final T[] items) {
+    this.items = items;
     mode = MODE_NORMAL;
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
     builder.setTitle(getHint());
-    builder.setItems(adapter, new DialogInterface.OnClickListener() {
+
+    String[] itemsLabel = convertToLabel(items);
+
+    builder.setItems(itemsLabel, new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
-        CharSequence item = adapter[selectedIndex];
+        T item = items[selectedIndex];
         setText(itemPresenter.getLabelOf(item, selectedIndex));
 
         if (itemSelectedListener != null)
-          itemSelectedListener.onItemSelected(Spinney.this, (T)item, selectedIndex);
+          itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
       }
     });
     builder.setPositiveButton("close", null);
     alertDialog = builder.create();
+  }
+
+  @NonNull private String[] convertToLabel(T[] items) {
+    String[] itemsLabel = new String[items.length];
+    int index = 0;
+    for (T i : items) {
+      itemsLabel[index] = itemPresenter.getLabelOf(i, index++);
+    }
+    return itemsLabel;
   }
 
   @Override protected void onDraw(Canvas canvas) {
@@ -115,8 +128,21 @@ public class Spinney<T> extends AppCompatEditText {
     setClickable(true);
   }
 
-  public void setOnItemSelectedListener(OnItemSelectedListener itemSelectedListener) {
+  public void setOnItemSelectedListener(OnItemSelectedListener<T> itemSelectedListener) {
     this.itemSelectedListener = itemSelectedListener;
+  }
+
+  public <K> void filterBy(Spinney<K> parent, final Filter<T, K> filter) {
+    parent.setOnItemSelectedListener(new OnItemSelectedListener<K>() {
+      @Override public void onItemSelected(Spinney view, K selectedItem, int position) {
+        List<T> filtered = new ArrayList<T>();
+        for (T i : items) {
+          if (filter.onChanged(selectedItem, i)) filtered.add(i);
+        }
+        T[] t = (T[]) filtered.toArray();
+        setItems(t);
+      }
+    });
   }
 
   public interface OnItemSelectedListener<T> {
@@ -126,5 +152,9 @@ public class Spinney<T> extends AppCompatEditText {
 
   public interface ItemPresenter {
     String getLabelOf(Object item, int position);
+  }
+
+  public interface Filter<T, K> {
+    boolean onChanged(K parent, T item);
   }
 }

@@ -55,5 +55,11 @@ public class SampleActivity extends AppCompatActivity {
         Toast.makeText(SampleActivity.this, selectedItem, Toast.LENGTH_SHORT).show();
       }
     });
+
+    normalSpinney.filterBy(searchablespinney, new Spinney.Filter<String, String>() {
+      @Override public boolean onChanged(String parentItem, String item) {
+        return item.equals(parentItem);
+      }
+    });
   }
 }

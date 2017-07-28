@@ -23,6 +23,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Filterable;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -81,7 +82,7 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener 
     return true;
   }
 
-  public void setAdapter(ListAdapter adapter) {
+  public void setAdapter(ArrayAdapter adapter) {
     listViewItems = (ListView)findViewById(R.id.spinney_list);
     listViewItems.setAdapter(adapter);
     listViewItems.setTextFilterEnabled(true);
