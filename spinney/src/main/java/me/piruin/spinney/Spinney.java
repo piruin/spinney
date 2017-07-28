@@ -39,13 +39,20 @@ public class Spinney<T> extends AppCompatEditText {
   private OnItemSelectedListener<T> itemSelectedListener;
   private ItemPresenter itemPresenter = defaultItemPresenter;
   private SpinneyAdapter<T> adapter;
+  private final CharSequence hint;
 
-  public Spinney(Context context) { super(context); }
+  public Spinney(Context context) { this(context, null); }
 
-  public Spinney(Context context, AttributeSet attrs) { super(context, attrs); }
+  public Spinney(Context context, AttributeSet attrs) { this(context, attrs, 0); }
 
   public Spinney(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+
+    /*
+      Save hint at constructor because, after this getHint() will return null
+      when use Spinney as child of Support's TextInputLayout.
+     */
+    hint = getHint();
   }
 
   public static void setDefaultItemPresenter(@NonNull ItemPresenter defaultItemDisplayer) {
@@ -57,6 +64,7 @@ public class Spinney<T> extends AppCompatEditText {
 
     SearchableListDialog searchableListDialog = new SearchableListDialog(getContext());
     searchableListDialog.setAdapter(adapter);
+    searchableListDialog.setHint(hint);
     searchableListDialog.setOnItemSelectedListener(
       new SearchableListDialog.OnItemSelectedListener<T>() {
 
@@ -84,7 +92,7 @@ public class Spinney<T> extends AppCompatEditText {
   public void setItems(@NonNull final List<T> items) {
     adapter = new SpinneyAdapter<>(getContext(), items);
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-    builder.setTitle(getHint());
+    builder.setTitle(hint);
     builder.setAdapter(adapter,
       new DialogInterface.OnClickListener() {
         @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {

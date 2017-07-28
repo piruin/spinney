@@ -92,6 +92,10 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener 
     });
   }
 
+  public void setHint(CharSequence hint) {
+    searchView.setQueryHint(hint);
+  }
+
   public interface OnItemSelectedListener<T> extends Serializable {
 
     /**

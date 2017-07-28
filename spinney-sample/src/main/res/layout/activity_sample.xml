@@ -29,14 +29,16 @@
   <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <me.piruin.spinney.Spinney android:id="@+id/spinney_searchable"
-      android:hint="Spinney Searchable"
+      android:hint="@string/spinney_searchable"
       android:layout_width="match_parent"
       android:layout_height="wrap_content" />
   </android.support.design.widget.TextInputLayout>
 
   <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <me.piruin.spinney.Spinney android:id="@+id/spinney_normal" android:hint="Spinney Normal"
+    <me.piruin.spinney.Spinney
+      android:id="@+id/spinney_normal"
+      android:hint="@string/spinney_normal"
       android:layout_width="match_parent"
       android:layout_height="wrap_content" />
   </android.support.design.widget.TextInputLayout>
