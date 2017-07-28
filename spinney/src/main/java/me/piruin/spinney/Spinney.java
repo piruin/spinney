@@ -37,6 +37,7 @@ public class Spinney<T> extends AppCompatEditText {
 
   private Dialog dialog;
   private OnItemSelectedListener<T> itemSelectedListener;
+  private OnItemSelectedListener<T> _itemSelectedListener;
   private ItemPresenter itemPresenter = defaultItemPresenter;
   private SpinneyAdapter<T> adapter;
   private final CharSequence hint;
@@ -70,10 +71,7 @@ public class Spinney<T> extends AppCompatEditText {
 
         @Override
         public boolean onItemSelected(Object item, int position) {
-          setText(itemPresenter.getLabelOf(item, position));
-
-          if (itemSelectedListener != null)
-            itemSelectedListener.onItemSelected(Spinney.this, (T) item, position);
+          Spinney.this.onItemSelected(position, (T) item);
           return true;
         }
       });
@@ -96,15 +94,20 @@ public class Spinney<T> extends AppCompatEditText {
     builder.setAdapter(adapter,
       new DialogInterface.OnClickListener() {
         @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
-          T item = (T) adapter.getItem(selectedIndex);
-          setText(itemPresenter.getLabelOf(item, selectedIndex));
-
-          if (itemSelectedListener != null)
-            itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+          onItemSelected(selectedIndex, (T) adapter.getItem(selectedIndex));
         }
       });
     builder.setPositiveButton("close", null);
     dialog = builder.create();
+  }
+
+  private void onItemSelected(int selectedIndex, T item) {
+    setText(itemPresenter.getLabelOf(item, selectedIndex));
+
+    if (_itemSelectedListener != null)
+      _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+    if (itemSelectedListener != null)
+      itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
   }
 
   @Override protected void onDraw(Canvas canvas) {
@@ -118,11 +121,11 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   public <K> void filterBy(Spinney<K> parent, final Condition<T, K> filter) {
-    parent.setOnItemSelectedListener(new OnItemSelectedListener<K>() {
+    parent._itemSelectedListener = new OnItemSelectedListener<K>() {
       @Override public void onItemSelected(Spinney view, K selectedItem, int position) {
         adapter.updateCondition(selectedItem, filter);
       }
-    });
+    };
   }
 
   public interface OnItemSelectedListener<T> {

@@ -20,7 +20,7 @@
   <string name="define_Spinney"></string>
   <string name="library_Spinney_author">Blast Piruin Panichphol</string>
   <string name="library_Spinney_authorWebsite">https://piruin.me</string>
-  <string name="library_Spinney_libraryName">Spinney</string>
+  <string name="library_Spinney_libraryName">@string/lib_name</string>
   <string name="library_Spinney_libraryDescription">Android Spinner with Super-Power</string>
   <string name="library_Spinney_libraryVersion">1</string>
   <string name="library_Spinney_libraryWebsite">https://piruin.me/spinney</string>

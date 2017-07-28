@@ -11,6 +11,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import me.piruin.spinney.Spinney.ItemPresenter;
 
 public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
@@ -22,10 +23,10 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
   };
   private final Context context;
   private final int layoutId;
-  private List<T> items;
+  private List<T> originalItems;
   private List<T> conditionedItem;
-  private final ItemPresenter presenter;
   private List<T> filteredItem;
+  private final ItemPresenter presenter;
 
   public SpinneyAdapter(Context context, List<T> items) {
     this(context, items, DEFAULT_PRESENTER);
@@ -40,7 +41,7 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
     super();
     this.context = context;
     this.layoutId = layoutId;
-    this.items = items;
+    this.originalItems = items;
     this.conditionedItem = new ArrayList<>(items);
     this.filteredItem = new ArrayList<>(items);
     this.presenter = presenter;
@@ -74,7 +75,7 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
 
   public <K> void updateCondition(K value, Spinney.Condition<T, K> condition) {
     conditionedItem = new ArrayList<>();
-    for (T item : items) {
+    for (T item : originalItems) {
       System.out.println("filtered " + item.toString());
       if (condition.filter(value, item)) conditionedItem.add(item);
     }
@@ -91,9 +92,10 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
           results.count = conditionedItem.size();
         } else {
           List<T> nlist = new ArrayList<>();
-          String query = constraint.toString().toLowerCase();
+          String query = constraint.toString().toLowerCase(Locale.getDefault());
           for (T item : conditionedItem) {
-            if (presenter.getLabelOf(item, 0).toLowerCase().contains(query)) nlist.add(item);
+            if (presenter.getLabelOf(item, 0).toLowerCase(Locale.getDefault()).contains(query))
+              nlist.add(item);
           }
           results.values = nlist;
           results.count = nlist.size();
