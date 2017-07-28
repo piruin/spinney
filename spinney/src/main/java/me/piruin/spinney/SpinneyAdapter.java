@@ -91,8 +91,9 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
           results.count = conditionedItem.size();
         } else {
           List<T> nlist = new ArrayList<>();
+          String query = constraint.toString().toLowerCase();
           for (T item : conditionedItem) {
-            if (item.toString().contains(constraint)) nlist.add(item);
+            if (presenter.getLabelOf(item, 0).toLowerCase().contains(query)) nlist.add(item);
           }
           results.values = nlist;
           results.count = nlist.size();
@@ -102,12 +103,8 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
 
       @Override
       protected void publishResults(CharSequence constraint, final FilterResults results) {
-        if (results.count == 0)
-          notifyDataSetInvalidated();
-        else {
-          filteredItem = (List<T>) results.values;
-          notifyDataSetChanged();
-        }
+        filteredItem = (List<T>) results.values;
+        notifyDataSetChanged();
       }
     };
   }
