@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class Spinney<T> extends AppCompatEditText {
 
-  private static ItemPresenter defaultItemPresenter = new ItemPresenter() {
+  static ItemPresenter defaultItemPresenter = new ItemPresenter() {
     @Override public String getLabelOf(Object item, int position) {
       return item.toString();
     }
@@ -96,15 +96,8 @@ public class Spinney<T> extends AppCompatEditText {
     dialog = searchableListDialog;
   }
 
-  /**
-   * ItemPresenter to use only on instance of Spinney. Spinney will use global presenter if this not
-   * set
-   *
-   * @param itemPresenter to control how spinney and (Searchable)listDialog represent selectable
-   * item  instead of global ItemPresent
-   */
-  public final void setItemPresenter(@NonNull ItemPresenter itemPresenter) {
-    this.itemPresenter = itemPresenter;
+  public void setSearchableItem(@NonNull final List<T> items) {
+    setSearchableAdapter(new SpinneyAdapter<T>(getContext(), items, itemPresenter));
   }
 
   /**
@@ -113,7 +106,7 @@ public class Spinney<T> extends AppCompatEditText {
    * @param items list of item use
    */
   public void setItems(@NonNull final List<T> items) {
-    adapter = new SpinneyAdapter<>(getContext(), items);
+    adapter = new SpinneyAdapter<>(getContext(), items, itemPresenter);
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
     builder.setTitle(hint);
     builder.setAdapter(adapter,
@@ -153,6 +146,17 @@ public class Spinney<T> extends AppCompatEditText {
     super.onDraw(canvas);
     setFocusable(false);
     setClickable(true);
+  }
+
+  /**
+   * ItemPresenter to use only on instance of Spinney. Spinney will use global presenter if this not
+   * set
+   *
+   * @param itemPresenter to control how spinney and (Searchable)listDialog represent selectable
+   * item  instead of global ItemPresent
+   */
+  public final void setItemPresenter(@NonNull ItemPresenter itemPresenter) {
+    this.itemPresenter = itemPresenter;
   }
 
   /**

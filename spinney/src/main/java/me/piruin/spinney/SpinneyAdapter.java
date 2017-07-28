@@ -17,11 +17,6 @@ import me.piruin.spinney.Spinney.ItemPresenter;
 
 public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
 
-  public static final ItemPresenter DEFAULT_PRESENTER = new ItemPresenter() {
-    @Override public String getLabelOf(Object item, int position) {
-      return item.toString();
-    }
-  };
   private final Context context;
   private final int layoutId;
   private List<T> originalItems;
@@ -30,7 +25,7 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
   private final ItemPresenter presenter;
 
   public SpinneyAdapter(Context context, List<T> items) {
-    this(context, items, DEFAULT_PRESENTER);
+    this(context, items, Spinney.defaultItemPresenter);
   }
 
   public SpinneyAdapter(Context context, List<T> items, ItemPresenter presenter) {

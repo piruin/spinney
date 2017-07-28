@@ -66,7 +66,7 @@ public class SampleActivity extends AppCompatActivity {
       new DatabaseItem(3, "SOUTH KOREA"),
       new DatabaseItem(4, "VIETNAM"));
 
-    countrySpinney.setSearchableAdapter(new SpinneyAdapter<>(this, country));
+    countrySpinney.setSearchableItem(country);
     countrySpinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<DatabaseItem>() {
       @Override public void onItemSelected(Spinney view, DatabaseItem selectedItem, int position) {
         Toast.makeText(SampleActivity.this, "Welcome to " + selectedItem.getName(),
