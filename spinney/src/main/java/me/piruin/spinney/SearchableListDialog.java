@@ -23,9 +23,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Filterable;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnCloseListener;
@@ -82,12 +80,15 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener 
     return true;
   }
 
-  public void setAdapter(ArrayAdapter adapter) {
+  public void setAdapter(SpinneyAdapter adapter) {
     listViewItems = (ListView)findViewById(R.id.spinney_list);
     listViewItems.setAdapter(adapter);
+    listViewItems.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     listViewItems.setTextFilterEnabled(true);
     listViewItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        listViewItems.setSelected(true);
+        listViewItems.setItemChecked(position, true);
         boolean shouldDismiss = onItemSelectedListener.onItemSelected(parent.getItemAtPosition(position), position);
         if (shouldDismiss)
           dismiss();

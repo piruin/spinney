@@ -19,11 +19,12 @@ package me.piruin.spinney.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import java.util.Arrays;
 import me.piruin.spinney.Spinney;
+import me.piruin.spinney.SpinneyAdapter;
 
 public class SampleActivity extends AppCompatActivity {
 
@@ -36,15 +37,14 @@ public class SampleActivity extends AppCompatActivity {
     ButterKnife.bind(this);
 
     searchablespinney.setSearchableAdapter(
-      new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                         new String[] {"NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC"}));
+      new SpinneyAdapter<>(this, Arrays.asList("NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC")));
     searchablespinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
       @Override public void onItemSelected(Spinney view, String selectedItem, int position) {
         Toast.makeText(SampleActivity.this, selectedItem, Toast.LENGTH_SHORT).show();
       }
     });
 
-    normalSpinney.setItems(new String[] {"NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC"});
+    normalSpinney.setItems(Arrays.asList("NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC"));
     normalSpinney.setItemPresenter(new Spinney.ItemPresenter() {
       @Override public String getLabelOf(Object item, int position) {
         return item.toString();
@@ -56,8 +56,8 @@ public class SampleActivity extends AppCompatActivity {
       }
     });
 
-    normalSpinney.filterBy(searchablespinney, new Spinney.Filter<String, String>() {
-      @Override public boolean onChanged(String parentItem, String item) {
+    normalSpinney.filterBy(searchablespinney, new Spinney.Condition<String, String>() {
+      @Override public boolean filter(String parentItem, String item) {
         return item.equals(parentItem);
       }
     });
