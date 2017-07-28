@@ -91,14 +91,14 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
           results.values = conditionedItem;
           results.count = conditionedItem.size();
         } else {
-          List<T> nlist = new ArrayList<>();
+          List<T> filteredList = new ArrayList<>();
           String query = constraint.toString().toLowerCase(Locale.getDefault());
           for (T item : conditionedItem) {
             if (presenter.getLabelOf(item, 0).toLowerCase(Locale.getDefault()).contains(query))
-              nlist.add(item);
+              filteredList.add(item);
           }
-          results.values = nlist;
-          results.count = nlist.size();
+          results.values = filteredList;
+          results.count = filteredList.size();
         }
         return results;
       }

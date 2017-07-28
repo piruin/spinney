@@ -30,18 +30,31 @@ import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 import java.io.Serializable;
 
+/**
+ * Dialog with SearchView and ListView design for represent a lot items with filterable function.
+ * This dialog use as default dialog for searchable mode of Spinney but it also can use separately
+ * as easy as use ordinary dialog
+ */
 public class SearchableListDialog extends Dialog implements OnQueryTextListener {
-  private ListView listViewItems;
 
   private OnItemSelectedListener onItemSelectedListener;
 
-  private SearchView searchView;
+  private final SearchView searchView;
+  private final ListView listViewItems;
 
   public SearchableListDialog(Context context) {
     super(context);
 
     setContentView(R.layout.searchable_list_dialog);
-    setupSearchView();
+    searchView = (SearchView) findViewById(R.id.spinney_search);
+    searchView.setIconifiedByDefault(false);
+    searchView.setOnQueryTextListener(this);
+    searchView.setOnCloseListener(new OnCloseListener() {
+      @Override public boolean onClose() { return false; }
+    });
+    searchView.clearFocus();
+
+    listViewItems = (ListView) findViewById(R.id.spinney_list);
 
     hindSoftKeyboard(context);
   }
@@ -52,36 +65,19 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener 
     mgr.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
   }
 
-  private void setupSearchView() {
-    searchView = (SearchView)findViewById(R.id.spinney_search);
-    searchView.setIconifiedByDefault(false);
-    searchView.setOnQueryTextListener(this);
-    searchView.setOnCloseListener(new OnCloseListener() {
-      @Override public boolean onClose() { return false; }
-    });
-    searchView.clearFocus();
+  /**
+   * @param onItemSelectedListener to callback when item was selected
+   */
+  public void setOnItemSelectedListener(OnItemSelectedListener onItemSelectedListener) {
+    this.onItemSelectedListener = onItemSelectedListener;
   }
 
-  void setOnItemSelectedListener(OnItemSelectedListener searchableItem) {
-    this.onItemSelectedListener = searchableItem;
-  }
-
-  @Override public boolean onQueryTextSubmit(String query) {
-    searchView.clearFocus();
-    return true;
-  }
-
-  @Override public boolean onQueryTextChange(String query) {
-    if (TextUtils.isEmpty(query)) {
-      ((Filterable)listViewItems.getAdapter()).getFilter().filter(null);
-    } else {
-      ((Filterable)listViewItems.getAdapter()).getFilter().filter(query);
-    }
-    return true;
-  }
-
+  /**
+   * Adapter of item to present on dialog
+   *
+   * @param adapter to show on ListView of Dialog
+   */
   public void setAdapter(SpinneyAdapter adapter) {
-    listViewItems = (ListView)findViewById(R.id.spinney_list);
     listViewItems.setAdapter(adapter);
     listViewItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -92,16 +88,38 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener 
     });
   }
 
-  public void setHint(CharSequence hint) {
+  /**
+   * @param hint to use as hint on at SearchView of dialog
+   */
+  public final void setHint(CharSequence hint) {
     searchView.setQueryHint(hint);
   }
 
+  @Override public final boolean onQueryTextSubmit(String query) {
+    searchView.clearFocus();
+    return true;
+  }
+
+  @Override public final boolean onQueryTextChange(String query) {
+    if (TextUtils.isEmpty(query)) {
+      ((Filterable) listViewItems.getAdapter()).getFilter().filter(null);
+    } else {
+      ((Filterable) listViewItems.getAdapter()).getFilter().filter(query);
+    }
+    return true;
+  }
+
+  /**
+   * Callback to handle when item of SearchableListDialog was selected
+   *
+   * @param <T> type of Item
+   */
   public interface OnItemSelectedListener<T> extends Serializable {
 
     /**
      * @param item that have been selected
-     * @param position of selected item on list zero-base
-     * @return should dialog close itself or not
+     * @param position of selected item showing list zero-base, warning this may not same as origin position
+     * @return whether should dialog close itself or not
      */
     boolean onItemSelected(T item, int position);
   }
