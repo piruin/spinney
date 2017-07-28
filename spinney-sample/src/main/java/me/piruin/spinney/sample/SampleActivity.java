@@ -74,6 +74,7 @@ public class SampleActivity extends AppCompatActivity {
       }
     });
 
+
     List<DatabaseItem> cities = Arrays.asList(
       new DatabaseItem(1, "BANGKOK", 1),
       new DatabaseItem(2, "PATTAYA", 1),
@@ -96,5 +97,8 @@ public class SampleActivity extends AppCompatActivity {
           countrySpinney.getSelectedItem().getName());
       }
     });
+
+    //setSelectedItem() must call after filterBy()
+    countrySpinney.setSelectedItem(new DatabaseItem(1, "THAILAND"));
   }
 }

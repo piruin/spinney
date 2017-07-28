@@ -41,20 +41,15 @@ public class Spinney<T> extends AppCompatEditText {
     }
   };
 
-  /**
-   * Dialog object to show selectable item of Spinney can be Searchable or normal List Dialog
-   */
+  /** Dialog object to show selectable item of Spinney can be Searchable or normal List Dialog */
   private Dialog dialog;
 
-  /**
-   * OnItemSelectedListener set by Library user
-   */
+  /** OnItemSelectedListener set by Library user */
   private OnItemSelectedListener<T> itemSelectedListener;
 
-  /**
-   * Internal OnItemSelectedListener use when filterBy() was called
-   */
+  /** Internal OnItemSelectedListener use when filterBy() was called */
   private OnItemSelectedListener<T> _itemSelectedListener;
+
   private ItemPresenter itemPresenter = defaultItemPresenter;
   private SpinneyAdapter<T> adapter;
   private final CharSequence hint;
@@ -117,7 +112,6 @@ public class Spinney<T> extends AppCompatEditText {
           onItemSelected((T) adapter.getItem(selectedIndex), selectedIndex);
         }
       });
-    builder.setPositiveButton("close", null);
     dialog = builder.create();
   }
 
@@ -152,6 +146,28 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /**
+   * Must call after adapter or item have already set
+   *
+   * @param item to set as selected item
+   * @throws IllegalArgumentException if not found item in adapter of spinney
+   */
+  public void setSelectedItem(T item) {
+    if (adapter == null)
+      throw new IllegalStateException("Must set adapter or item before call this");
+
+    int positionOf = adapter.findPositionOf(item);
+    if (positionOf >= 0)
+      onItemSelected(item, positionOf);
+    else
+      throw new IllegalArgumentException("Not found specify item");
+  }
+
+  /** @return selected item, this may be null */
+  @Nullable public T getSelectedItem() {
+    return selectedItem;
+  }
+
+  /**
    * ItemPresenter to use only on instance of Spinney. Spinney will use global presenter if this not
    * set
    *
@@ -162,9 +178,7 @@ public class Spinney<T> extends AppCompatEditText {
     this.itemPresenter = itemPresenter;
   }
 
-  /**
-   * @param itemSelectedListener to callback when item was selected
-   */
+  /** @param itemSelectedListener to callback when item was selected */
   public final void setOnItemSelectedListener(
     @NonNull OnItemSelectedListener<T> itemSelectedListener) {
     this.itemSelectedListener = itemSelectedListener;
@@ -194,14 +208,16 @@ public class Spinney<T> extends AppCompatEditText {
     void onItemSelected(Spinney view, T selectedItem, int position);
   }
 
-  @Nullable public T getSelectedItem() {
-    return selectedItem;
-  }
-
-  /**
-   * Control how item used with Spinney should present as String on Spinney view and Dialog
-   */
+  /** Control how item used with Spinney should present as String on Spinney view and Dialog */
   public interface ItemPresenter {
+
+    /**
+     * Time to parse item to present on Spinney
+     *
+     * @param item target item to parse
+     * @param position of item when it was select
+     * @return respresent String of item
+     */
     String getLabelOf(Object item, int position);
   }
 

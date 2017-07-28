@@ -34,4 +34,22 @@ public class DatabaseItem {
       ", name='" + name + '\'' +
       '}';
   }
+
+  @Override public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    DatabaseItem that = (DatabaseItem) o;
+
+    if (id != that.id) return false;
+    if (parentId != that.parentId) return false;
+    return name.equals(that.name);
+  }
+
+  @Override public int hashCode() {
+    int result = id;
+    result = 31 * result + name.hashCode();
+    result = 31 * result + parentId;
+    return result;
+  }
 }

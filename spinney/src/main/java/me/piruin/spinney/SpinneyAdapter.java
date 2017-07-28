@@ -82,6 +82,15 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
     return new FilterByLabel();
   }
 
+  /**
+   *
+   * @param item
+   * @return
+   */
+  public int findPositionOf(T item) {
+    return originalItems.indexOf(item);
+  }
+
   private class FilterByLabel extends Filter {
 
     private final Locale locale = Locale.getDefault();
