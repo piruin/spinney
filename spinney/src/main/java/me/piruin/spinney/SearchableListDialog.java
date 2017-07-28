@@ -83,12 +83,8 @@ public class SearchableListDialog extends Dialog implements OnQueryTextListener 
   public void setAdapter(SpinneyAdapter adapter) {
     listViewItems = (ListView)findViewById(R.id.spinney_list);
     listViewItems.setAdapter(adapter);
-    listViewItems.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-    listViewItems.setTextFilterEnabled(true);
     listViewItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        listViewItems.setSelected(true);
-        listViewItems.setItemChecked(position, true);
         boolean shouldDismiss = onItemSelectedListener.onItemSelected(parent.getItemAtPosition(position), position);
         if (shouldDismiss)
           dismiss();

@@ -17,6 +17,7 @@
 
 package me.piruin.spinney;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
@@ -28,18 +29,13 @@ import java.util.List;
 
 public class Spinney<T> extends AppCompatEditText {
 
-  public static final int MODE_NORMAL = 1;
-  public static final int MODE_SEARCHABLE = 2;
-
   private static ItemPresenter defaultItemPresenter = new ItemPresenter() {
     @Override public String getLabelOf(Object item, int position) {
       return item.toString();
     }
   };
 
-  private SearchableListDialog searchableListDialog;
-  private int mode = MODE_NORMAL;
-  private AlertDialog alertDialog;
+  private Dialog dialog;
   private OnItemSelectedListener<T> itemSelectedListener;
   private ItemPresenter itemPresenter = defaultItemPresenter;
   private SpinneyAdapter<T> adapter;
@@ -56,15 +52,13 @@ public class Spinney<T> extends AppCompatEditText {
     Spinney.defaultItemPresenter = defaultItemDisplayer;
   }
 
-  public void setSearchableAdapter(final SpinneyAdapter<T> adapter) {
+  public void setSearchableAdapter(@NonNull final SpinneyAdapter<T> adapter) {
     this.adapter = adapter;
-    mode = MODE_SEARCHABLE;
 
-    searchableListDialog = new SearchableListDialog(getContext());
+    SearchableListDialog searchableListDialog = new SearchableListDialog(getContext());
     searchableListDialog.setAdapter(adapter);
     searchableListDialog.setOnItemSelectedListener(
       new SearchableListDialog.OnItemSelectedListener<T>() {
-
 
         @Override
         public boolean onItemSelected(Object item, int position) {
@@ -75,6 +69,7 @@ public class Spinney<T> extends AppCompatEditText {
           return true;
         }
       });
+    dialog = searchableListDialog;
   }
 
   public void setItemPresenter(@NonNull ItemPresenter itemPresenter) {
@@ -82,37 +77,27 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   @Override public boolean performClick() {
-    if (mode == MODE_SEARCHABLE) {
-      searchableListDialog.show();
-      return true;
-    } else if (mode == MODE_NORMAL) {
-      alertDialog.show();
-      return true;
-    }
-    return false;
+    dialog.show();
+    return true;
   }
 
-  public void setItems(final List<T> items) {
-    mode = MODE_NORMAL;
+  public void setItems(@NonNull final List<T> items) {
+    adapter = new SpinneyAdapter<>(getContext(), items);
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
     builder.setTitle(getHint());
-
-    adapter = new SpinneyAdapter<>(getContext(), items);
     builder.setAdapter(adapter,
       new DialogInterface.OnClickListener() {
-      @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
-        T item = (T) adapter.getItem(selectedIndex);
-        setText(itemPresenter.getLabelOf(item, selectedIndex));
+        @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
+          T item = (T) adapter.getItem(selectedIndex);
+          setText(itemPresenter.getLabelOf(item, selectedIndex));
 
-        if (itemSelectedListener != null)
-          itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
-      }
-    });
+          if (itemSelectedListener != null)
+            itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+        }
+      });
     builder.setPositiveButton("close", null);
-    alertDialog = builder.create();
+    dialog = builder.create();
   }
-
-
 
   @Override protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
@@ -120,7 +105,7 @@ public class Spinney<T> extends AppCompatEditText {
     setClickable(true);
   }
 
-  public void setOnItemSelectedListener(OnItemSelectedListener<T> itemSelectedListener) {
+  public void setOnItemSelectedListener(@NonNull OnItemSelectedListener<T> itemSelectedListener) {
     this.itemSelectedListener = itemSelectedListener;
   }
 
@@ -133,7 +118,6 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   public interface OnItemSelectedListener<T> {
-
     void onItemSelected(Spinney view, T selectedItem, int position);
   }
 
