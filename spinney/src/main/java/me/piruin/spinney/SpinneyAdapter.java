@@ -48,7 +48,6 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
   }
 
   @Override public Object getItem(int position) {
-    System.out.println("selected item is " + filteredItem.get(position));
     return filteredItem.get(position);
   }
 
@@ -83,9 +82,8 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
   }
 
   /**
-   *
-   * @param item
-   * @return
+   * @param item to find position
+   * @return position (index) of item on original items list
    */
   public int findPositionOf(T item) {
     return originalItems.indexOf(item);

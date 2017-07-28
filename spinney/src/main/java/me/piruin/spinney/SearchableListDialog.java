@@ -75,7 +75,7 @@ public class SearchableListDialog extends Dialog {
 
   private void hindSoftKeyboard(Context context) {
     InputMethodManager mgr =
-      (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+      (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
     mgr.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
   }
 
@@ -91,20 +91,21 @@ public class SearchableListDialog extends Dialog {
    *
    * @param adapter to show on ListView of Dialog
    */
-  public void setAdapter(SpinneyAdapter adapter) {
+  public void setAdapter(final SpinneyAdapter adapter) {
     listViewItems.setAdapter(adapter);
     listViewItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        boolean shouldDismiss = onItemSelectedListener.onItemSelected(parent.getItemAtPosition(position), position);
+        Object selectedItem = parent.getItemAtPosition(position);
+        boolean shouldDismiss = onItemSelectedListener.onItemSelected(
+          selectedItem,
+          adapter.findPositionOf(selectedItem));
         if (shouldDismiss)
           dismiss();
       }
     });
   }
 
-  /**
-   * @param hint to use as hint on at SearchView of dialog
-   */
+  /** @param hint to use as hint on at SearchView of dialog */
   public final void setHint(CharSequence hint) {
     searchView.setQueryHint(hint);
   }
@@ -118,7 +119,7 @@ public class SearchableListDialog extends Dialog {
 
     /**
      * @param item that have been selected
-     * @param position of selected item showing list zero-base, warning this may not same as origin position
+     * @param position of selected item in original list Not filtered list!
      * @return whether should dialog close itself or not
      */
     boolean onItemSelected(T item, int position);

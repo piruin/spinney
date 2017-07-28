@@ -70,8 +70,7 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /**
-   * Use this when number of items is large more than user can scan by their eye
-   * SpinneyAdapter is ready to use, Just new instance and set require parameter
+   * Call this when build-in SpinneyAdapter not enough for you requirement
    *
    * @param adapter spinneyAdapter to use with SearchableListDialog
    */
@@ -93,12 +92,22 @@ public class Spinney<T> extends AppCompatEditText {
     dialog = searchableListDialog;
   }
 
+  /**
+   * <pre>
+   * Use this when number of items is more than user can scan by their eye.
+   *
+   * This method use inpurt list of item to create SpinneyAdapter if want to custom.
+   * See setSearchableAdapter(SpinneyAdpter)
+   * </pre>
+   *
+   * @param items list of item use
+   */
   public void setSearchableItem(@NonNull final List<T> items) {
-    setSearchableAdapter(new SpinneyAdapter<T>(getContext(), items, itemPresenter));
+    setSearchableAdapter(new SpinneyAdapter<>(getContext(), items, itemPresenter));
   }
 
   /**
-   * Lazy mode of Spinney just set List of item! no more adapter require
+   * Just set List of item on Dialog! Don't worry with Adapter Spinney will handler with it
    *
    * @param items list of item use
    */
@@ -109,7 +118,8 @@ public class Spinney<T> extends AppCompatEditText {
     builder.setAdapter(adapter,
       new DialogInterface.OnClickListener() {
         @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
-          onItemSelected((T) adapter.getItem(selectedIndex), selectedIndex);
+          T selectedItem = (T) adapter.getItem(selectedIndex);
+          onItemSelected((T) selectedItem, adapter.findPositionOf(selectedItem));
         }
       });
     dialog = builder.create();
@@ -151,7 +161,7 @@ public class Spinney<T> extends AppCompatEditText {
    * @param item to set as selected item
    * @throws IllegalArgumentException if not found item in adapter of spinney
    */
-  public void setSelectedItem(T item) {
+  public final void setSelectedItem(T item) {
     if (adapter == null)
       throw new IllegalStateException("Must set adapter or item before call this");
 
@@ -163,8 +173,20 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /** @return selected item, this may be null */
-  @Nullable public T getSelectedItem() {
+  @Nullable public final T getSelectedItem() {
     return selectedItem;
+  }
+
+  /** @return position of selected item, -1 is nothing select */
+  public final int getSelectedItemPosition() {
+    return adapter.findPositionOf(selectedItem);
+  }
+
+  /**
+   * @param adapter may help if you really need it. By the way, Use with CAUTION!
+   */
+  public final void setAdapter(SpinneyAdapter<T> adapter) {
+    this.adapter = adapter;
   }
 
   /**

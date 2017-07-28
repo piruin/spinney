@@ -50,6 +50,13 @@ public class SampleActivity extends AppCompatActivity {
 
     searchableDept.setSearchableAdapter(
       new SpinneyAdapter<>(this, department));
+    searchableDept.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
+      @Override public void onItemSelected(Spinney view, String selectedItem, int position) {
+        if (position != view.getSelectedItemPosition()) {
+          Toast.makeText(SampleActivity.this, "this is impossible", Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
 
     normalDept.setItems(department);
     normalDept.setItemPresenter(new Spinney.ItemPresenter() {
@@ -93,7 +100,7 @@ public class SampleActivity extends AppCompatActivity {
     });
     citiesSpinney.setItemPresenter(new Spinney.ItemPresenter() {
       @Override public String getLabelOf(Object item, int position) {
-        return String.format("%s - %s", ((DatabaseItem) item).getName(),
+        return String.format("%d.%s - %s", position, ((DatabaseItem) item).getName(),
           countrySpinney.getSelectedItem().getName());
       }
     });
