@@ -89,6 +89,10 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
     return originalItems.indexOf(item);
   }
 
+  public boolean isFilteredListContain(T item) {
+    return filteredItem.contains(item);
+  }
+
   private class FilterByLabel extends Filter {
 
     private final Locale locale = Locale.getDefault();

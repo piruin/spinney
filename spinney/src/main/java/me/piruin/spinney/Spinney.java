@@ -85,7 +85,7 @@ public class Spinney<T> extends AppCompatEditText {
 
         @Override
         public boolean onItemSelected(Object item, int position) {
-          Spinney.this.onItemSelected((T) item, position);
+          whenItemSelected((T) item, position);
           return true;
         }
       });
@@ -119,27 +119,35 @@ public class Spinney<T> extends AppCompatEditText {
       new DialogInterface.OnClickListener() {
         @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
           T selectedItem = (T) adapter.getItem(selectedIndex);
-          onItemSelected((T) selectedItem, adapter.findPositionOf(selectedItem));
+          whenItemSelected(selectedItem, adapter.findPositionOf(selectedItem));
         }
       });
     dialog = builder.create();
   }
 
-  private void onItemSelected(T item, int selectedIndex) {
-    setText(itemPresenter.getLabelOf(item, selectedIndex));
-
+  private void whenItemSelected(@Nullable T item, int selectedIndex) {
     this.selectedItem = item;
+    if (item == null) {
+      setText(null);
+    } else {
+      setText(itemPresenter.getLabelOf(item, selectedIndex));
 
-    if (_itemSelectedListener != null)
-      _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
-    if (itemSelectedListener != null)
-      itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+      if (_itemSelectedListener != null)
+        _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+      if (itemSelectedListener != null)
+        itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+    }
   }
 
   public final <K> void filterBy(Spinney<K> parent, final Condition<T, K> filter) {
     parent._itemSelectedListener = new OnItemSelectedListener<K>() {
-      @Override public void onItemSelected(Spinney view, K selectedItem, int position) {
-        adapter.updateCondition(selectedItem, filter);
+
+      @Override public void onItemSelected(Spinney view, K parentSelectedItem, int position) {
+        adapter.updateCondition(parentSelectedItem, filter);
+        T selectedItem = getSelectedItem();
+        if (selectedItem != null && !adapter.isFilteredListContain(selectedItem)) {
+          whenItemSelected(null, -1);
+        }
       }
     };
   }
@@ -167,7 +175,7 @@ public class Spinney<T> extends AppCompatEditText {
 
     int positionOf = adapter.findPositionOf(item);
     if (positionOf >= 0)
-      onItemSelected(item, positionOf);
+      whenItemSelected(item, positionOf);
     else
       throw new IllegalArgumentException("Not found specify item");
   }
