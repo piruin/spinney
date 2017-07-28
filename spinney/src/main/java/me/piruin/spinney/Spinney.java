@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
@@ -57,6 +58,7 @@ public class Spinney<T> extends AppCompatEditText {
   private ItemPresenter itemPresenter = defaultItemPresenter;
   private SpinneyAdapter<T> adapter;
   private final CharSequence hint;
+  private T selectedItem;
 
   public Spinney(Context context) { this(context, null); }
 
@@ -122,6 +124,7 @@ public class Spinney<T> extends AppCompatEditText {
   private void onItemSelected(T item, int selectedIndex) {
     setText(itemPresenter.getLabelOf(item, selectedIndex));
 
+    this.selectedItem = item;
 
     if (_itemSelectedListener != null)
       _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
@@ -189,6 +192,10 @@ public class Spinney<T> extends AppCompatEditText {
      * @param position at current list
      */
     void onItemSelected(Spinney view, T selectedItem, int position);
+  }
+
+  @Nullable public T getSelectedItem() {
+    return selectedItem;
   }
 
   /**

@@ -60,7 +60,7 @@ public class SampleActivity extends AppCompatActivity {
   }
 
   public void specifyType() {
-    List<DatabaseItem> country = Arrays.asList(
+    final List<DatabaseItem> country = Arrays.asList(
       new DatabaseItem(1, "THAILAND"),
       new DatabaseItem(2, "JAPAN"),
       new DatabaseItem(3, "SOUTH KOREA"),
@@ -88,6 +88,12 @@ public class SampleActivity extends AppCompatActivity {
     citiesSpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
       @Override public boolean filter(DatabaseItem parentItem, DatabaseItem item) {
         return item.getParentId() == parentItem.getId();
+      }
+    });
+    citiesSpinney.setItemPresenter(new Spinney.ItemPresenter() {
+      @Override public String getLabelOf(Object item, int position) {
+        return String.format("%s - %s", ((DatabaseItem) item).getName(),
+          countrySpinney.getSelectedItem().getName());
       }
     });
   }
