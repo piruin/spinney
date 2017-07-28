@@ -51,6 +51,7 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
   }
 
   @Override public Object getItem(int position) {
+    System.out.println("selected item is " + filteredItem.get(position));
     return filteredItem.get(position);
   }
 
@@ -73,9 +74,11 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
 
   public <K> void updateCondition(K value, Spinney.Condition<T, K> condition) {
     conditionedItem = new ArrayList<>();
-    for (T item : items)
+    for (T item : items) {
+      System.out.println("filtered " + item.toString());
       if (condition.filter(value, item)) conditionedItem.add(item);
-
+    }
+    filteredItem = new ArrayList<>(conditionedItem);
     notifyDataSetChanged();
   }
 
