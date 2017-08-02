@@ -135,7 +135,7 @@ public class Spinney<T> extends AppCompatEditText {
   public void setItems(@NonNull final List<T> items) {
     adapter = new SpinneyAdapter<>(getContext(), items, itemPresenter);
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-    builder.setTitle(hint);
+    builder.setTitle(getHint() != null ? getHint() : hint);
     builder.setAdapter(adapter,
       new DialogInterface.OnClickListener() {
         @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
