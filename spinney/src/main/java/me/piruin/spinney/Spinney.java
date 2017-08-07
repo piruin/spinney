@@ -40,24 +40,22 @@ public class Spinney<T> extends AppCompatEditText {
       return item.toString();
     }
   };
-
+  private final CharSequence hint;
   /** Dialog object to show selectable item of Spinney can be Searchable or normal List Dialog */
   private Dialog dialog;
-
   /** OnItemSelectedListener set by Library user */
   private OnItemSelectedListener<T> itemSelectedListener;
-
   /** Internal OnItemSelectedListener use when filterBy() was called */
   private OnItemSelectedListener<T> _itemSelectedListener;
-
   private ItemPresenter itemPresenter = defaultItemPresenter;
   private SpinneyAdapter<T> adapter;
-  private final CharSequence hint;
   private T selectedItem;
 
   public Spinney(Context context) { this(context, null); }
 
-  public Spinney(Context context, AttributeSet attrs) { this(context, attrs, 0); }
+  public Spinney(Context context, AttributeSet attrs) {
+    this(context, attrs, android.R.attr.editTextStyle);
+  }
 
   public Spinney(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
@@ -67,6 +65,29 @@ public class Spinney<T> extends AppCompatEditText {
       when use Spinney as child of Support's TextInputLayout.
      */
     hint = getHint();
+  }
+
+  /**
+   * replace default global ItemPresenter this should be set at Application.onCreate()
+   *
+   * @param defaultItemDisplayer to present selected object on spinney view
+   */
+  public static void setDefaultItemPresenter(@NonNull ItemPresenter defaultItemDisplayer) {
+    Spinney.defaultItemPresenter = defaultItemDisplayer;
+  }
+
+  /**
+   * <pre>
+   * Use this when number of items is more than user can scan by their eye.
+   *
+   * This method use inpurt list of item to create SpinneyAdapter if want to custom.
+   * See setSearchableAdapter(SpinneyAdpter)
+   * </pre>
+   *
+   * @param items list of item use
+   */
+  public void setSearchableItem(@NonNull final List<T> items) {
+    setSearchableAdapter(new SpinneyAdapter<>(getContext(), items, itemPresenter));
   }
 
   /**
@@ -92,18 +113,18 @@ public class Spinney<T> extends AppCompatEditText {
     dialog = searchableListDialog;
   }
 
-  /**
-   * <pre>
-   * Use this when number of items is more than user can scan by their eye.
-   *
-   * This method use inpurt list of item to create SpinneyAdapter if want to custom.
-   * See setSearchableAdapter(SpinneyAdpter)
-   * </pre>
-   *
-   * @param items list of item use
-   */
-  public void setSearchableItem(@NonNull final List<T> items) {
-    setSearchableAdapter(new SpinneyAdapter<>(getContext(), items, itemPresenter));
+  private void whenItemSelected(@Nullable T item, int selectedIndex) {
+    this.selectedItem = item;
+    if (item == null) {
+      setText(null);
+    } else {
+      setText(itemPresenter.getLabelOf(item, selectedIndex));
+
+      if (_itemSelectedListener != null)
+        _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+      if (itemSelectedListener != null)
+        itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+    }
   }
 
   /**
@@ -125,20 +146,6 @@ public class Spinney<T> extends AppCompatEditText {
     dialog = builder.create();
   }
 
-  private void whenItemSelected(@Nullable T item, int selectedIndex) {
-    this.selectedItem = item;
-    if (item == null) {
-      setText(null);
-    } else {
-      setText(itemPresenter.getLabelOf(item, selectedIndex));
-
-      if (_itemSelectedListener != null)
-        _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
-      if (itemSelectedListener != null)
-        itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
-    }
-  }
-
   public final <K> void filterBy(Spinney<K> parent, final Condition<T, K> filter) {
     parent._itemSelectedListener = new OnItemSelectedListener<K>() {
 
@@ -151,6 +158,9 @@ public class Spinney<T> extends AppCompatEditText {
       }
     };
   }
+
+  /** @return selected item, this may be null */
+  @Nullable public final T getSelectedItem() { return selectedItem; }
 
   @Override public final boolean performClick() {
     dialog.show();
@@ -180,9 +190,6 @@ public class Spinney<T> extends AppCompatEditText {
       throw new IllegalArgumentException("Not found specify item");
   }
 
-  /** @return selected item, this may be null */
-  @Nullable public final T getSelectedItem() { return selectedItem; }
-
   /** @return position of selected item, -1 is nothing select */
   public final int getSelectedItemPosition() { return adapter.findPositionOf(selectedItem); }
 
@@ -208,15 +215,6 @@ public class Spinney<T> extends AppCompatEditText {
   public final void setOnItemSelectedListener(
     @NonNull OnItemSelectedListener<T> itemSelectedListener) {
     this.itemSelectedListener = itemSelectedListener;
-  }
-
-  /**
-   * replace default global ItemPresenter this should be set at Application.onCreate()
-   *
-   * @param defaultItemDisplayer to present selected object on spinney view
-   */
-  public static void setDefaultItemPresenter(@NonNull ItemPresenter defaultItemDisplayer) {
-    Spinney.defaultItemPresenter = defaultItemDisplayer;
   }
 
   /**
