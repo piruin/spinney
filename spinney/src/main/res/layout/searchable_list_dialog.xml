@@ -22,7 +22,7 @@
   android:tag="@string/lib_name"
   android:orientation="vertical">
 
-  <SearchView
+  <android.support.v7.widget.SearchView
     android:id="@+id/spinney_search"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
