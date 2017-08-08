@@ -43,8 +43,8 @@ dependencies {
   def butterKnifeVersion = '8.5.1'
 
   compile fileTree(dir: 'libs', include: ['*.jar'])
-  //compile project(':spinney')
-  compile "me.piruin:spinney:$rootProject.version"
+  compile project(':spinney')
+  //compile "me.piruin:spinney:$rootProject.version"
   compile "com.android.support:appcompat-v7:$supportLibVersion"
   compile "com.android.support:design:$supportLibVersion"
   compile "com.jakewharton:butterknife:$butterKnifeVersion"
