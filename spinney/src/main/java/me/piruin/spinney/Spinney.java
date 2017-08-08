@@ -173,6 +173,11 @@ public class Spinney<T> extends AppCompatEditText {
     setClickable(true);
   }
 
+  public void clearSelection() {
+    setText(null);
+    selectedItem = null;
+  }
+
   /**
    * Must call after adapter or item have already set
    *
