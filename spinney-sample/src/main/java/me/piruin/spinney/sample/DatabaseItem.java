@@ -1,6 +1,6 @@
 package me.piruin.spinney.sample;
 
-public class DatabaseItem {
+class DatabaseItem {
 
   private final int id;
   private final String name;

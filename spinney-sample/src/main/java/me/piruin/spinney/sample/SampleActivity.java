@@ -19,93 +19,54 @@ package me.piruin.spinney.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Locale;
 import me.piruin.spinney.Spinney;
-import me.piruin.spinney.SpinneyAdapter;
 
 public class SampleActivity extends AppCompatActivity {
 
   @BindView(R.id.spinney_searchable) Spinney<String> searchableDept;
   @BindView(R.id.spinney_normal) Spinney<String> normalDept;
-
   @BindView(R.id.spinney_country) Spinney<DatabaseItem> countrySpinney;
-  @BindView(R.id.spinney_cities) Spinney<DatabaseItem> citiesSpinney;
+  @BindView(R.id.spinney_city) Spinney<DatabaseItem> citySpinney;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_sample);
     ButterKnife.bind(this);
 
-    simpleString();
-
-    specifyType();
+    useSimpleListOfString();
+    useListOfDatabaseItemWithFilterByFeature();
   }
 
-  private void simpleString() {
-    List<String> department = Arrays.asList("NSTDA", "NECTEC", "BIOTEC", "MTEC", "NANOTEC");
-
-    searchableDept.setSearchableAdapter(
-      new SpinneyAdapter<>(this, department));
-    searchableDept.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
-      @Override public void onItemSelected(Spinney view, String selectedItem, int position) {
-        if (position != view.getSelectedItemPosition()) {
-          Toast.makeText(SampleActivity.this, "this is impossible", Toast.LENGTH_SHORT).show();
-        }
-      }
-    });
-
-    normalDept.setItems(department);
-    normalDept.setItemPresenter(new Spinney.ItemPresenter() {
-      @Override public String getLabelOf(Object item, int position) {
-        return item.toString();
-      }
-    });
+  private void useSimpleListOfString() {
+    searchableDept.setSearchableItem(Data.department);
+    normalDept.setItems(Data.department);
   }
 
-  public void specifyType() {
-    final List<DatabaseItem> country = Arrays.asList(
-      new DatabaseItem(1, "THAILAND"),
-      new DatabaseItem(2, "JAPAN"),
-      new DatabaseItem(3, "SOUTH KOREA"),
-      new DatabaseItem(4, "VIETNAM"));
-
-    countrySpinney.setSearchableItem(country);
+  public void useListOfDatabaseItemWithFilterByFeature() {
+    countrySpinney.setSearchableItem(Data.country);
     countrySpinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<DatabaseItem>() {
       @Override public void onItemSelected(Spinney view, DatabaseItem selectedItem, int position) {
-        Toast.makeText(SampleActivity.this, "Welcome to " + selectedItem.getName(),
-          Toast.LENGTH_SHORT).show();
+        citySpinney.clearSelection();
       }
     });
 
-
-    List<DatabaseItem> cities = Arrays.asList(
-      new DatabaseItem(1, "BANGKOK", 1),
-      new DatabaseItem(2, "PATTAYA", 1),
-      new DatabaseItem(3, "CHIANG MAI", 1),
-      new DatabaseItem(4, "TOKYO", 2),
-      new DatabaseItem(5, "HOKKAIDO", 2),
-      new DatabaseItem(6, "SEOUL", 3),
-      new DatabaseItem(7, "HOJIMIN", 4)
-    );
-
-    citiesSpinney.setItems(cities);
-    citiesSpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
+    citySpinney.setItems(Data.cities);
+    citySpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
       @Override public boolean filter(DatabaseItem parentItem, DatabaseItem item) {
         return item.getParentId() == parentItem.getId();
       }
     });
-    citiesSpinney.setItemPresenter(new Spinney.ItemPresenter() {
+    citySpinney.setItemPresenter(new Spinney.ItemPresenter() { //Custom item presenter add Spinney
       @Override public String getLabelOf(Object item, int position) {
-        return String.format("%d.%s - %s", position, ((DatabaseItem) item).getName(),
+        return String.format(Locale.getDefault(), "%d.%s - %s", position,
+          ((DatabaseItem) item).getName(),
           countrySpinney.getSelectedItem().getName());
       }
     });
-
-    //setSelectedItem() must call after filterBy()
+    //setSelectedItem() of parent Spinney must call after filterBy()
     countrySpinney.setSelectedItem(new DatabaseItem(1, "THAILAND"));
   }
 }
