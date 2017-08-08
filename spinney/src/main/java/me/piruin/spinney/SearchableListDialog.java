@@ -45,7 +45,7 @@ public class SearchableListDialog extends Dialog {
   public SearchableListDialog(Context context) {
     super(context);
 
-    setContentView(R.layout.searchable_list_dialog);
+    setContentView(R.layout.spinney_searchable_list_dialog);
     searchView = (SearchView) findViewById(R.id.spinney_search);
     searchView.setIconifiedByDefault(false);
     searchView.setOnQueryTextListener(new OnQueryTextListener() {
