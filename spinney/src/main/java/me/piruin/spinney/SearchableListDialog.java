@@ -19,15 +19,15 @@ package me.piruin.spinney;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnCloseListener;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Filterable;
 import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.SearchView.OnCloseListener;
-import android.widget.SearchView.OnQueryTextListener;
 import java.io.Serializable;
 
 /**
