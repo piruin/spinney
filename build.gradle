@@ -6,7 +6,8 @@ version = {->
     commandLine 'git', 'describe', '--tags'
     standardOutput = stdout
   }
-  return stdout.toString().trim()
+  def tag = stdout.toString().trim()
+  return tag.substring(0, tag.indexOf('-'))
 }.call()
 
 buildscript {
