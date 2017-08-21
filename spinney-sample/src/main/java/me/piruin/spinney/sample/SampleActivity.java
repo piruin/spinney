@@ -30,6 +30,7 @@ public class SampleActivity extends AppCompatActivity {
   @BindView(R.id.spinney_normal) Spinney<String> normalDept;
   @BindView(R.id.spinney_country) Spinney<DatabaseItem> countrySpinney;
   @BindView(R.id.spinney_city) Spinney<DatabaseItem> citySpinney;
+  @BindView(R.id.spinney_district) Spinney<DatabaseItem> districtSpinney;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -43,23 +44,31 @@ public class SampleActivity extends AppCompatActivity {
 
   private void useSimpleListOfString() {
     searchableDept.setSearchableItem(Data.department);
+    searchableDept.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
+      @Override public void onItemSelected(Spinney view, String selectedItem, int position) {
+        normalDept.clearSelection();
+      }
+    });
     normalDept.setItems(Data.department);
   }
 
   public void useListOfDatabaseItemWithFilterByFeature() {
-    countrySpinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<DatabaseItem>() {
-      @Override public void onItemSelected(Spinney view, DatabaseItem selectedItem, int position) {
-        citySpinney.clearSelection();
-      }
-    });
 
     countrySpinney.setSearchableItem(Data.country);
     citySpinney.setItems(Data.cities);
+    districtSpinney.setItems(Data.districts);
+
     citySpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
       @Override public boolean filter(DatabaseItem selectedCountry, DatabaseItem eachCity) {
         return eachCity.getParentId() == selectedCountry.getId();
       }
     });
+    districtSpinney.filterBy(citySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
+      @Override public boolean filter(DatabaseItem selectedCity, DatabaseItem eachDistrict) {
+        return eachDistrict.getParentId() == selectedCity.getId();
+      }
+    });
+
     citySpinney.setItemPresenter(new Spinney.ItemPresenter() { //Custom item presenter add Spinney
       @Override public String getLabelOf(Object item, int position) {
         return String.format(Locale.getDefault(), "%d.%s - %s", position,
@@ -67,6 +76,7 @@ public class SampleActivity extends AppCompatActivity {
           countrySpinney.getSelectedItem().getName());
       }
     });
+
     //setSelectedItem() of parent Spinney must call after filterBy()
     countrySpinney.setSelectedItem(new DatabaseItem(1, "THAILAND"));
   }

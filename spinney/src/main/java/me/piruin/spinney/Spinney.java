@@ -70,8 +70,10 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /**
-   * Enable safe mode to all spinney use in Application by default
+   * <pre>
+   * Enable safe mode to all spinney use in Application by default.
    * By the way, only use this in case of emergency
+   * </pre>
    *
    * @param enable or disable safe mode
    */
@@ -105,19 +107,17 @@ public class Spinney<T> extends AppCompatEditText {
   /**
    * Call this when build-in SpinneyAdapter not enough for you requirement
    *
-   * @param adapter spinneyAdapter to use with SearchableListDialog
+   * @param adapter spinneyAdapter to use with SpinneyDialog
    */
   public final void setSearchableAdapter(@NonNull final SpinneyAdapter<T> adapter) {
     this.adapter = adapter;
 
-    SearchableListDialog searchableListDialog = new SearchableListDialog(getContext());
+    SpinneyDialog searchableListDialog = new SpinneyDialog(getContext());
     searchableListDialog.setAdapter(adapter);
     searchableListDialog.setHint(hint);
     searchableListDialog.setOnItemSelectedListener(
-      new SearchableListDialog.OnItemSelectedListener<T>() {
-
-        @Override
-        public boolean onItemSelected(Object item, int position) {
+      new SpinneyDialog.OnItemSelectedListener<T>() {
+        @Override public boolean onItemSelected(@NonNull Object item, int position) {
           whenItemSelected((T) item, position);
           return true;
         }
@@ -129,9 +129,10 @@ public class Spinney<T> extends AppCompatEditText {
     this.selectedItem = item;
     if (item == null) {
       setText(null);
+      if (_itemSelectedListener != null)
+        _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
     } else {
       setText(itemPresenter.getLabelOf(item, selectedIndex));
-
       if (_itemSelectedListener != null)
         _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
       if (itemSelectedListener != null)
@@ -140,7 +141,8 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /**
-   * enable safeMode to tell Spinney not throw exception when set selectedItem that not found in adapter.
+   * enable safeMode to tell Spinney not throw exception when set selectedItem that not found in
+   * adapter.
    * not recommend this in app that need consistency
    *
    * @param enable or disable saftmode
@@ -188,11 +190,15 @@ public class Spinney<T> extends AppCompatEditText {
   public final <K> void filterBy(Spinney<K> parent, final Condition<T, K> filter) {
     parent._itemSelectedListener = new OnItemSelectedListener<K>() {
 
-      @Override public void onItemSelected(Spinney view, K parentSelectedItem, int position) {
+      @Override public void onItemSelected(Spinney parent, K parentSelectedItem, int position) {
+        if (parentSelectedItem == null) {
+          clearSelection();
+          adapter.clearCondition();
+          return;
+        }
         adapter.updateCondition(parentSelectedItem, filter);
-        T selectedItem = getSelectedItem();
-        if (selectedItem != null && !adapter.isFilteredListContain(selectedItem)) {
-          whenItemSelected(null, -1);
+        if (!adapter.isFilteredListContain(selectedItem)) {
+          clearSelection();
         }
       }
     };
@@ -210,18 +216,19 @@ public class Spinney<T> extends AppCompatEditText {
     super.onDraw(canvas);
     setFocusable(false);
     setClickable(true);
+    setLongClickable(false);
   }
 
   public final void clearSelection() {
-    setText(null);
-    selectedItem = null;
+    whenItemSelected(null, -1);
   }
 
   /**
    * Must call after adapter or item have already set
    *
    * @param item to set as selected item
-   * @throws IllegalArgumentException if not found item in adapter of spinney, enableSafeMode() to disable this exception. safeMode is disable by default
+   * @throws IllegalArgumentException if not found item in adapter of spinney, enableSafeMode() to
+   * disable this exception. safeMode is disable by default
    */
   public final void setSelectedItem(@NonNull T item) {
     if (adapter == null)

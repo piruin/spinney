@@ -2,6 +2,8 @@ package me.piruin.spinney;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,10 +70,16 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
     return convertView;
   }
 
-  <K> void updateCondition(K value, Spinney.Condition<T, K> condition) {
+  void clearCondition() {
+    conditionedItem = new ArrayList<>(originalItems);
+    filteredItem = new ArrayList<>(conditionedItem);
+    notifyDataSetChanged();
+  }
+
+  <K> void updateCondition(@NonNull K parentItem, Spinney.Condition<T, K> condition) {
     conditionedItem = new ArrayList<>();
     for (T item : originalItems) {
-      if (condition.filter(value, item)) conditionedItem.add(item);
+      if (condition.filter(parentItem, item)) conditionedItem.add(item);
     }
     filteredItem = new ArrayList<>(conditionedItem);
     notifyDataSetChanged();
@@ -89,7 +97,7 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
     return originalItems.indexOf(item);
   }
 
-  public boolean isFilteredListContain(T item) {
+  public boolean isFilteredListContain(@Nullable T item) {
     return filteredItem.contains(item);
   }
 

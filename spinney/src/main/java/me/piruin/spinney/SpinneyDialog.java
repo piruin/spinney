@@ -35,17 +35,17 @@ import java.io.Serializable;
  * This dialog use as default dialog for searchable mode of Spinney but it also can use separately
  * as easy as use ordinary dialog
  */
-public class SearchableListDialog extends Dialog {
+public class SpinneyDialog extends Dialog {
 
   private OnItemSelectedListener onItemSelectedListener;
 
   private final SearchView searchView;
   private final ListView listViewItems;
 
-  public SearchableListDialog(Context context) {
+  public SpinneyDialog(Context context) {
     super(context);
 
-    setContentView(R.layout.spinney_searchable_list_dialog);
+    setContentView(R.layout.spinney_dialog);
     searchView = (SearchView) findViewById(R.id.spinney_search);
     searchView.setIconifiedByDefault(false);
     searchView.setOnQueryTextListener(new OnQueryTextListener() {
@@ -111,7 +111,7 @@ public class SearchableListDialog extends Dialog {
   }
 
   /**
-   * Callback to handle when item of SearchableListDialog was selected
+   * Callback to handle when item of SpinneyDialog was selected
    *
    * @param <T> type of Item
    */
