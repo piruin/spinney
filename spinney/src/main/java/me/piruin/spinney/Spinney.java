@@ -214,6 +214,13 @@ public class Spinney<T> extends AppCompatEditText {
   /** @return selected item, this may be null */
   @Nullable public final T getSelectedItem() { return selectedItem; }
 
+  /**
+   * @return check that spinney have item to select or have nothing by filter
+   */
+  public final boolean isSelectable() {
+    return adapter.getCount() > 0;
+  }
+
   @Override public final boolean performClick() {
     dialog.show();
     return true;
