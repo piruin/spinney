@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import java.util.Locale;
 import me.piruin.spinney.Spinney;
 
@@ -90,5 +91,9 @@ public class SampleActivity extends AppCompatActivity {
 
     citySpinney.setSafeModeEnable(true);
     citySpinney.setSelectedItem(new DatabaseItem(60, "GOTHAM"));
+  }
+
+  @OnClick(R.id.clear) void onClearClick() {
+    countrySpinney.clearSelection();
   }
 }

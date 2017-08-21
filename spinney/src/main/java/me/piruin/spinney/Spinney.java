@@ -171,21 +171,26 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /**
-   * Set parent spinney and Condition to filter selectable item by selected item of parent Spinney
    *
+   * Set parent spinney and Condition to filter selectable item by selected item of parent Spinney
+   * <pre>
+   * {@code
    * countrySpinney.setSearchableItem(Data.country);
    * citySpinney.setItems(Data.cities);
-   * citySpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
+   * citySpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem<>() {
+   *   public boolean filter(DatabaseItem selectedCountry, DatabaseItem eachCity) {
+   *     return eachCity.getParentId() == selectedCountry.getId();
+   *   }});
+   * }
+   * </pre>
+   *
+   * Please note you must setSelectedItem() of parent Spinney after call filterBy()
+   *
    *
    * @param parent Spinney that it selected item will affect to this spinney
    * @param filter condition to filter item on this spinney by selected item of parent
    * @param <K> type of item on parent Spinney
-   * @Override public boolean filter(DatabaseItem selectedCountry, DatabaseItem eachCity) {
-   * return eachCity.getParentId() == selectedCountry.getId();
-   * }
-   * });
    *
-   * Please note you must setSelectedItem() of parent Spinney after call filterBy()
    */
   public final <K> void filterBy(Spinney<K> parent, final Condition<T, K> filter) {
     parent._itemSelectedListener = new OnItemSelectedListener<K>() {
@@ -202,6 +207,8 @@ public class Spinney<T> extends AppCompatEditText {
         }
       }
     };
+    adapter.setDependencyMode(true);
+    adapter.clearCondition();
   }
 
   /** @return selected item, this may be null */

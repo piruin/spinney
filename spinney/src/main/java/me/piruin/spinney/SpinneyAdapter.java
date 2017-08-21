@@ -25,6 +25,7 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
   private List<T> conditionedItem;
   private List<T> filteredItem;
   private final ItemPresenter presenter;
+  private boolean dependencyMode;
 
   public SpinneyAdapter(Context context, List<T> items) {
     this(context, items, Spinney.defaultItemPresenter);
@@ -71,8 +72,13 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
   }
 
   void clearCondition() {
-    conditionedItem = new ArrayList<>(originalItems);
-    filteredItem = new ArrayList<>(conditionedItem);
+    if (dependencyMode) {
+      conditionedItem = new ArrayList<>();
+      filteredItem = new ArrayList<>();
+    } else {
+      conditionedItem = new ArrayList<>(originalItems);
+      filteredItem = new ArrayList<>(conditionedItem);
+    }
     notifyDataSetChanged();
   }
 
@@ -99,6 +105,10 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
 
   public boolean isFilteredListContain(@Nullable T item) {
     return filteredItem.contains(item);
+  }
+
+  public void setDependencyMode(boolean dependencyMode) {
+    this.dependencyMode = dependencyMode;
   }
 
   private class FilterByLabel extends Filter {
