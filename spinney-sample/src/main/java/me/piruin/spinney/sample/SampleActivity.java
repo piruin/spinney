@@ -38,6 +38,7 @@ public class SampleActivity extends AppCompatActivity {
 
     useSimpleListOfString();
     useListOfDatabaseItemWithFilterByFeature();
+    playWithSafeMode();
   }
 
   private void useSimpleListOfString() {
@@ -46,17 +47,17 @@ public class SampleActivity extends AppCompatActivity {
   }
 
   public void useListOfDatabaseItemWithFilterByFeature() {
-    countrySpinney.setSearchableItem(Data.country);
     countrySpinney.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<DatabaseItem>() {
       @Override public void onItemSelected(Spinney view, DatabaseItem selectedItem, int position) {
         citySpinney.clearSelection();
       }
     });
 
+    countrySpinney.setSearchableItem(Data.country);
     citySpinney.setItems(Data.cities);
     citySpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
-      @Override public boolean filter(DatabaseItem parentItem, DatabaseItem item) {
-        return item.getParentId() == parentItem.getId();
+      @Override public boolean filter(DatabaseItem selectedCountry, DatabaseItem eachCity) {
+        return eachCity.getParentId() == selectedCountry.getId();
       }
     });
     citySpinney.setItemPresenter(new Spinney.ItemPresenter() { //Custom item presenter add Spinney
@@ -68,5 +69,16 @@ public class SampleActivity extends AppCompatActivity {
     });
     //setSelectedItem() of parent Spinney must call after filterBy()
     countrySpinney.setSelectedItem(new DatabaseItem(1, "THAILAND"));
+  }
+
+  private void playWithSafeMode() {
+    try {
+      //below will cause IllegalArgumentException cause not enableSafeMode
+      countrySpinney.setSelectedItem(new DatabaseItem(2000, "METROPOLIS"));
+    } catch (IllegalArgumentException ignore) {
+    }
+
+    citySpinney.setSafeModeEnable(true);
+    citySpinney.setSelectedItem(new DatabaseItem(60, "GOTHAM"));
   }
 }

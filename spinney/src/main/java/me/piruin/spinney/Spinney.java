@@ -50,6 +50,8 @@ public class Spinney<T> extends AppCompatEditText {
   private ItemPresenter itemPresenter = defaultItemPresenter;
   private SpinneyAdapter<T> adapter;
   private T selectedItem;
+  private boolean safeMode = defaultSafeMode;
+  private static boolean defaultSafeMode = false;
 
   public Spinney(Context context) { this(context, null); }
 
@@ -65,6 +67,16 @@ public class Spinney<T> extends AppCompatEditText {
       when use Spinney as child of Support's TextInputLayout.
      */
     hint = getHint();
+  }
+
+  /**
+   * Enable safe mode to all spinney use in Application by default
+   * By the way, only use this in case of emergency
+   *
+   * @param enable or disable safe mode
+   */
+  public static void enableSafeModeByDefault(boolean enable) {
+    defaultSafeMode = enable;
   }
 
   /**
@@ -86,7 +98,7 @@ public class Spinney<T> extends AppCompatEditText {
    *
    * @param items list of item use
    */
-  public void setSearchableItem(@NonNull final List<T> items) {
+  public final void setSearchableItem(@NonNull final List<T> items) {
     setSearchableAdapter(new SpinneyAdapter<>(getContext(), items, itemPresenter));
   }
 
@@ -95,7 +107,7 @@ public class Spinney<T> extends AppCompatEditText {
    *
    * @param adapter spinneyAdapter to use with SearchableListDialog
    */
-  public void setSearchableAdapter(@NonNull final SpinneyAdapter<T> adapter) {
+  public final void setSearchableAdapter(@NonNull final SpinneyAdapter<T> adapter) {
     this.adapter = adapter;
 
     SearchableListDialog searchableListDialog = new SearchableListDialog(getContext());
@@ -128,11 +140,21 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /**
+   * enable safeMode to tell Spinney not throw exception when set selectedItem that not found in adapter.
+   * not recommend this in app that need consistency
+   *
+   * @param enable or disable saftmode
+   */
+  public void setSafeModeEnable(boolean enable) {
+    this.safeMode = enable;
+  }
+
+  /**
    * Just set List of item on Dialog! Don't worry with Adapter Spinney will handler with it
    *
    * @param items list of item use
    */
-  public void setItems(@NonNull final List<T> items) {
+  public final void setItems(@NonNull final List<T> items) {
     adapter = new SpinneyAdapter<>(getContext(), items, itemPresenter);
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
     builder.setTitle(getHint() != null ? getHint() : hint);
@@ -146,6 +168,23 @@ public class Spinney<T> extends AppCompatEditText {
     dialog = builder.create();
   }
 
+  /**
+   * Set parent spinney and Condition to filter selectable item by selected item of parent Spinney
+   *
+   * countrySpinney.setSearchableItem(Data.country);
+   * citySpinney.setItems(Data.cities);
+   * citySpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
+   *
+   * @param parent Spinney that it selected item will affect to this spinney
+   * @param filter condition to filter item on this spinney by selected item of parent
+   * @param <K> type of item on parent Spinney
+   * @Override public boolean filter(DatabaseItem selectedCountry, DatabaseItem eachCity) {
+   * return eachCity.getParentId() == selectedCountry.getId();
+   * }
+   * });
+   *
+   * Please note you must setSelectedItem() of parent Spinney after call filterBy()
+   */
   public final <K> void filterBy(Spinney<K> parent, final Condition<T, K> filter) {
     parent._itemSelectedListener = new OnItemSelectedListener<K>() {
 
@@ -173,7 +212,7 @@ public class Spinney<T> extends AppCompatEditText {
     setClickable(true);
   }
 
-  public void clearSelection() {
+  public final void clearSelection() {
     setText(null);
     selectedItem = null;
   }
@@ -182,16 +221,16 @@ public class Spinney<T> extends AppCompatEditText {
    * Must call after adapter or item have already set
    *
    * @param item to set as selected item
-   * @throws IllegalArgumentException if not found item in adapter of spinney
+   * @throws IllegalArgumentException if not found item in adapter of spinney, enableSafeMode() to disable this exception. safeMode is disable by default
    */
-  public final void setSelectedItem(T item) {
+  public final void setSelectedItem(@NonNull T item) {
     if (adapter == null)
       throw new IllegalStateException("Must set adapter or item before call this");
 
     int positionOf = adapter.findPositionOf(item);
     if (positionOf >= 0)
       whenItemSelected(item, positionOf);
-    else
+    else if (!safeMode)
       throw new IllegalArgumentException("Not found specify item");
   }
 
@@ -203,7 +242,7 @@ public class Spinney<T> extends AppCompatEditText {
    *
    * @return SpinneyAdapter currently use by Spinney
    */
-  public SpinneyAdapter<T> getAdapter() { return adapter; }
+  public final SpinneyAdapter<T> getAdapter() { return adapter; }
 
   /**
    * ItemPresenter to use only on instance of Spinney. Spinney will use global presenter if this not

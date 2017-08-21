@@ -33,5 +33,6 @@ public class SampleApplication extends Application {
           return String.format("%s", item.toString());
       }
     });
+    //Spinney.enableSafeModeByDefault(true);
   }
 }
