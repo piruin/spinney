@@ -244,7 +244,7 @@ public class Spinney<T> extends AppCompatEditText {
    * @throws IllegalArgumentException if not found item in adapter of spinney, enableSafeMode() to
    * disable this exception. safeMode is disable by default
    */
-  public final void setSelectedItem(@NonNull T item) {
+  public final void setSelectedItem(@Nullable T item) {
     if (adapter == null)
       throw new IllegalStateException("Must set adapter or item before call this");
 
