@@ -19,10 +19,12 @@ package me.piruin.spinney.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import java.util.Locale;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import java.util.Locale;
 import me.piruin.spinney.Spinney;
 
 public class SampleActivity extends AppCompatActivity {
@@ -30,6 +32,8 @@ public class SampleActivity extends AppCompatActivity {
   @BindView(R.id.spinney_searchable) Spinney<String> searchableDept;
   @BindView(R.id.spinney_normal) Spinney<String> normalDept;
   @BindView(R.id.spinney_country) Spinney<DatabaseItem> countrySpinney;
+  @BindView(R.id.spinney_region)
+  Spinney<DatabaseItem> regionSpinney;
   @BindView(R.id.spinney_city) Spinney<DatabaseItem> citySpinney;
   @BindView(R.id.spinney_district) Spinney<DatabaseItem> districtSpinney;
 
@@ -54,11 +58,17 @@ public class SampleActivity extends AppCompatActivity {
   }
 
   public void useListOfDatabaseItemWithFilterByFeature() {
-
     countrySpinney.setSearchableItem(Data.country);
     citySpinney.setItems(Data.cities);
     districtSpinney.setItems(Data.districts);
+    regionSpinney.setItems(Data.regions);
 
+    regionSpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
+      @Override
+      public boolean filter(DatabaseItem selectedCountry, DatabaseItem eachRegion) {
+        return eachRegion.getParentId() == selectedCountry.getId();
+      }
+    });
     citySpinney.filterBy(countrySpinney, new Spinney.Condition<DatabaseItem, DatabaseItem>() {
       @Override public boolean filter(DatabaseItem selectedCountry, DatabaseItem eachCity) {
         return eachCity.getParentId() == selectedCountry.getId();

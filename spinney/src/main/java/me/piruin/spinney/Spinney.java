@@ -26,6 +26,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,8 +47,8 @@ public class Spinney<T> extends AppCompatEditText {
   private Dialog dialog;
   /** OnItemSelectedListener set by Library user */
   private OnItemSelectedListener<T> itemSelectedListener;
-  /** Internal OnItemSelectedListener use when filterBy() was called */
-  private OnItemSelectedListener<T> _itemSelectedListener;
+  /** Internal OnItemSelectedListeners use when filterBy() was called */
+  private List<OnItemSelectedListener<T>> _itemSelectedListeners = new ArrayList<>();
   private ItemPresenter itemPresenter = defaultItemPresenter;
   private SpinneyAdapter<T> adapter;
   private T selectedItem;
@@ -129,12 +131,12 @@ public class Spinney<T> extends AppCompatEditText {
     this.selectedItem = item;
     if (item == null) {
       setText(null);
-      if (_itemSelectedListener != null)
-        _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+      for (OnItemSelectedListener _listener : _itemSelectedListeners)
+        _listener.onItemSelected(Spinney.this, item, selectedIndex);
     } else {
       setText(itemPresenter.getLabelOf(item, selectedIndex));
-      if (_itemSelectedListener != null)
-        _itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+      for (OnItemSelectedListener _listener : _itemSelectedListeners)
+        _listener.onItemSelected(Spinney.this, item, selectedIndex);
       if (itemSelectedListener != null)
         itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
     }
@@ -193,7 +195,7 @@ public class Spinney<T> extends AppCompatEditText {
    *
    */
   public final <K> void filterBy(Spinney<K> parent, final Condition<T, K> filter) {
-    parent._itemSelectedListener = new OnItemSelectedListener<K>() {
+    parent._itemSelectedListeners.add(new OnItemSelectedListener<K>() {
 
       @Override public void onItemSelected(Spinney parent, K parentSelectedItem, int position) {
         if (parentSelectedItem == null) {
@@ -206,7 +208,7 @@ public class Spinney<T> extends AppCompatEditText {
           clearSelection();
         }
       }
-    };
+    });
     adapter.setDependencyMode(true);
     adapter.clearCondition();
   }
@@ -238,7 +240,7 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /**
-   * Must call after adapter or item have already set
+   * Must call after adapter or item have already set also after call <code>filterBy</code>
    *
    * @param item to set as selected item
    * @throws IllegalArgumentException if not found item in adapter of spinney, enableSafeMode() to
@@ -319,10 +321,10 @@ public class Spinney<T> extends AppCompatEditText {
   public interface Condition<T, K> {
 
     /**
-     * @param value may use as Condition to filter item
+     * @param parentItem selected object of parent spinney may use as Condition to filter item
      * @param item to check whether it should present or not
      * @return true if item should present, false otherwise
      */
-    boolean filter(K value, T item);
+    boolean filter(K parentItem, T item);
   }
 }
