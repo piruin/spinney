@@ -218,7 +218,7 @@ public class Spinney<T> extends AppCompatEditText {
    * @return check that spinney have item to select or have nothing by filter
    */
   public final boolean isSelectable() {
-    return adapter.getCount() > 0;
+    return adapter != null && adapter.getCount() > 0;
   }
 
   @Override public final boolean performClick() {
