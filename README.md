@@ -1,6 +1,7 @@
 # Spinney
 [![Build Status](https://travis-ci.org/piruin/spinney.svg?branch=master)](https://travis-ci.org/piruin/spinney)
 [![Download](https://api.bintray.com/packages/blazei/maven/Spinney/images/download.svg)](https://bintray.com/blazei/maven/Spinney/_latestVersion)
+[![license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 Android spinner with Super power!
 
