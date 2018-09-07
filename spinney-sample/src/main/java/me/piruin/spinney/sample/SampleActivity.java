@@ -19,12 +19,10 @@ package me.piruin.spinney.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
-import java.util.Locale;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import java.util.Locale;
 import me.piruin.spinney.Spinney;
 
 public class SampleActivity extends AppCompatActivity {
@@ -80,11 +78,11 @@ public class SampleActivity extends AppCompatActivity {
       }
     });
 
-    citySpinney.setItemPresenter(new Spinney.ItemPresenter() { //Custom item presenter add Spinney
-      @Override public String getLabelOf(Object item, int position) {
-        return String.format(Locale.getDefault(), "%d.%s - %s", position,
-          ((DatabaseItem) item).getName(),
-          countrySpinney.getSelectedItem().getName());
+    citySpinney.setItemPresenter(
+      new Spinney.ItemPresenter<DatabaseItem>() { //Custom item presenter add Spinney
+        @Override public String getLabelOf(DatabaseItem item, int position) {
+          return String.format(Locale.getDefault(), "%d.%s - %s", position, item.getName(),
+                               countrySpinney.getSelectedItem().getName());
       }
     });
 

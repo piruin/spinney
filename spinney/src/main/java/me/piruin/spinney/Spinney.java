@@ -17,6 +17,7 @@
 
 package me.piruin.spinney;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,7 +27,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +42,7 @@ public class Spinney<T> extends AppCompatEditText {
       return item.toString();
     }
   };
+  private static boolean defaultSafeMode = false;
   private final CharSequence hint;
   /** Dialog object to show selectable item of Spinney can be Searchable or normal List Dialog */
   private Dialog dialog;
@@ -53,7 +54,6 @@ public class Spinney<T> extends AppCompatEditText {
   private SpinneyAdapter<T> adapter;
   private T selectedItem;
   private boolean safeMode = defaultSafeMode;
-  private static boolean defaultSafeMode = false;
 
   public Spinney(Context context) { this(context, null); }
 
@@ -117,13 +117,12 @@ public class Spinney<T> extends AppCompatEditText {
     SpinneyDialog searchableListDialog = new SpinneyDialog(getContext());
     searchableListDialog.setAdapter(adapter);
     searchableListDialog.setHint(hint);
-    searchableListDialog.setOnItemSelectedListener(
-      new SpinneyDialog.OnItemSelectedListener<T>() {
-        @Override public boolean onItemSelected(@NonNull Object item, int position) {
-          whenItemSelected((T) item, position);
-          return true;
-        }
-      });
+    searchableListDialog.setOnItemSelectedListener(new SpinneyDialog.OnItemSelectedListener<T>() {
+      @Override public boolean onItemSelected(@NonNull Object item, int position) {
+        whenItemSelected((T) item, position);
+        return true;
+      }
+    });
     dialog = searchableListDialog;
   }
 
@@ -162,18 +161,16 @@ public class Spinney<T> extends AppCompatEditText {
     adapter = new SpinneyAdapter<>(getContext(), items, itemPresenter);
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
     builder.setTitle(getHint() != null ? getHint() : hint);
-    builder.setAdapter(adapter,
-      new DialogInterface.OnClickListener() {
-        @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
-          T selectedItem = (T) adapter.getItem(selectedIndex);
-          whenItemSelected(selectedItem, adapter.findPositionOf(selectedItem));
-        }
-      });
+    builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+      @Override public void onClick(DialogInterface dialogInterface, int selectedIndex) {
+        T selectedItem = (T) adapter.getItem(selectedIndex);
+        whenItemSelected(selectedItem, adapter.findPositionOf(selectedItem));
+      }
+    });
     dialog = builder.create();
   }
 
   /**
-   *
    * Set parent spinney and Condition to filter selectable item by selected item of parent Spinney
    * <pre>
    * {@code
@@ -188,11 +185,9 @@ public class Spinney<T> extends AppCompatEditText {
    *
    * Please note you must setSelectedItem() of parent Spinney after call filterBy()
    *
-   *
    * @param parent Spinney that it selected item will affect to this spinney
    * @param filter condition to filter item on this spinney by selected item of parent
    * @param <K> type of item on parent Spinney
-   *
    */
   public final <K> void filterBy(Spinney<K> parent, final Condition<T, K> filter) {
     parent._itemSelectedListeners.add(new OnItemSelectedListener<K>() {
@@ -213,6 +208,10 @@ public class Spinney<T> extends AppCompatEditText {
     adapter.clearCondition();
   }
 
+  public final void clearSelection() {
+    whenItemSelected(null, -1);
+  }
+
   /** @return selected item, this may be null */
   @Nullable public final T getSelectedItem() { return selectedItem; }
 
@@ -223,7 +222,7 @@ public class Spinney<T> extends AppCompatEditText {
     return adapter != null && adapter.getCount() > 0;
   }
 
-  @Override public final boolean performClick() {
+  @SuppressLint("ClickableViewAccessibility") @Override public final boolean performClick() {
     dialog.show();
     return true;
   }
@@ -233,10 +232,6 @@ public class Spinney<T> extends AppCompatEditText {
     setFocusable(false);
     setClickable(true);
     setLongClickable(false);
-  }
-
-  public final void clearSelection() {
-    whenItemSelected(null, -1);
   }
 
   /**
@@ -274,13 +269,14 @@ public class Spinney<T> extends AppCompatEditText {
    * @param itemPresenter to control how spinney and (Searchable)listDialog represent selectable
    * item  instead of global ItemPresent
    */
-  public final void setItemPresenter(@NonNull ItemPresenter itemPresenter) {
+  public final void setItemPresenter(@NonNull ItemPresenter<T> itemPresenter) {
     this.itemPresenter = itemPresenter;
   }
 
   /** @param itemSelectedListener to callback when item was selected */
   public final void setOnItemSelectedListener(
-    @NonNull OnItemSelectedListener<T> itemSelectedListener) {
+    @NonNull OnItemSelectedListener<T> itemSelectedListener)
+  {
     this.itemSelectedListener = itemSelectedListener;
   }
 
@@ -300,16 +296,16 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /** Control how item used with Spinney should present as String on Spinney view and Dialog */
-  public interface ItemPresenter {
+  public interface ItemPresenter<T> {
 
     /**
      * Time to parse item to present on Spinney
      *
      * @param item target item to parse
      * @param position of item when it was select
-     * @return respresent String of item
+     * @return represent String of item
      */
-    String getLabelOf(Object item, int position);
+    String getLabelOf(T item, int position);
   }
 
   /**
