@@ -4,7 +4,6 @@ plugins {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 
 group = rootProject.group
 version = rootProject.version
@@ -12,7 +11,6 @@ description = rootProject.description
 
 android {
   compileSdkVersion ANDROID_TARGET_SDK
-  buildToolsVersion ANDROID_BUILD_TOOLS
 
   defaultConfig {
     minSdkVersion ANDROID_MIN_SDK
@@ -46,9 +44,8 @@ android {
 }
 
 dependencies {
-  compile fileTree(dir: 'libs', include: ['*.jar'])
-  compile "com.android.support:appcompat-v7:$supportLibVersion"
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation "com.android.support:appcompat-v7:$supportLibVersion"
 }
 
 apply from: 'publish.gradle'
