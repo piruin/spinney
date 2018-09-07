@@ -46,7 +46,7 @@ public class SpinneyDialog extends Dialog {
     super(context);
 
     setContentView(R.layout.spinney_dialog);
-    searchView = (SearchView) findViewById(R.id.spinney_search);
+    searchView = findViewById(R.id.spinney_search);
     searchView.setIconifiedByDefault(false);
     searchView.setOnQueryTextListener(new OnQueryTextListener() {
       @Override public boolean onQueryTextSubmit(String query) {
@@ -68,7 +68,7 @@ public class SpinneyDialog extends Dialog {
     });
     searchView.clearFocus();
 
-    listViewItems = (ListView) findViewById(R.id.spinney_list);
+    listViewItems = findViewById(R.id.spinney_list);
 
     hindSoftKeyboard(context);
   }
