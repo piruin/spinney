@@ -23,6 +23,19 @@
 
   <android.support.design.widget.TextInputLayout
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <me.piruin.spinney.Spinney
+      android:id="@+id/spinney_normal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="@string/normal"
+      />
+  </android.support.design.widget.TextInputLayout>
+
+  <android.support.design.widget.TextInputLayout
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <me.piruin.spinney.Spinney
@@ -37,10 +50,11 @@
     android:layout_height="wrap_content">
 
     <me.piruin.spinney.Spinney
-      android:id="@+id/spinney_normal"
+      android:id="@+id/spinney_typeItem"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:hint="@string/normal" />
+      android:hint="@string/type_item"
+      />
   </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

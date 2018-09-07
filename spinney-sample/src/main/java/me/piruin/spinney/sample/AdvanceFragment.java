@@ -37,10 +37,9 @@ public class AdvanceFragment extends Fragment {
   @BindView(R.id.spinney_city) Spinney<DatabaseItem> citySpinney;
   @BindView(R.id.spinney_district) Spinney<DatabaseItem> districtSpinney;
 
-  @Nullable @Override public View onCreateView(
-    @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-    @Nullable Bundle savedInstanceState)
-  {
+  @Nullable @Override
+  public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+    @Nullable Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_advance, container, false);
     ButterKnife.bind(this, view);
     return view;
@@ -54,7 +53,18 @@ public class AdvanceFragment extends Fragment {
 
   public void useListOfDatabaseItemWithFilterByFeature() {
     countrySpinney.setSearchableItem(Data.country);
-    citySpinney.setItems(Data.cities);
+    citySpinney.setItemPresenter(
+      new Spinney.ItemPresenter<DatabaseItem>() { //Custom item presenter add Spinney
+        @Override public String getLabelOf(DatabaseItem item, int position) {
+          return String.format(Locale.getDefault(), "%d. %s", position, item.getName());
+        }
+      });
+    citySpinney.setItemCaptionPresenter(new Spinney.ItemPresenter<DatabaseItem>() {
+      @Override public String getLabelOf(DatabaseItem item, int position) {
+        return countrySpinney.getSelectedItem().getName();
+      }
+    });
+    citySpinney.setSearchableItem(Data.cities);
     districtSpinney.setItems(Data.districts);
     regionSpinney.setItems(Data.regions);
 
@@ -73,14 +83,6 @@ public class AdvanceFragment extends Fragment {
         return eachDistrict.getParentId() == selectedCity.getId();
       }
     });
-
-    citySpinney.setItemPresenter(
-      new Spinney.ItemPresenter<DatabaseItem>() { //Custom item presenter add Spinney
-        @Override public String getLabelOf(DatabaseItem item, int position) {
-          return String.format(Locale.getDefault(), "%d.%s - %s", position, item.getName(),
-                               countrySpinney.getSelectedItem().getName());
-        }
-      });
 
     //setSelectedItem() of parent Spinney must call after filterBy()
     countrySpinney.setSelectedItem(new DatabaseItem(1, "THAILAND"));

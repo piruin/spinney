@@ -21,10 +21,11 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
 
   private final Context context;
   private final int layoutId;
+  private final ItemPresenter presenter;
   private List<T> originalItems;
   private List<T> conditionedItem;
   private List<T> filteredItem;
-  private final ItemPresenter presenter;
+  private ItemPresenter captionPresenter;
   private boolean isDependencyMode;
 
   public SpinneyAdapter(Context context, List<T> items) {
@@ -32,7 +33,7 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
   }
 
   public SpinneyAdapter(Context context, List<T> items, ItemPresenter presenter) {
-    this(context, android.R.layout.simple_list_item_1, items, presenter);
+    this(context, R.layout.spinney_item, items, presenter);
   }
 
   public SpinneyAdapter(Context context, @LayoutRes int layoutId, List<T> items,
@@ -46,28 +47,40 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
     this.presenter = presenter;
   }
 
-  @Override public int getCount() {
-    return filteredItem.size();
+  public void setCaptionPresenter(@Nullable ItemPresenter captionPresenter) {
+    this.captionPresenter = captionPresenter;
   }
 
-  @Override public Object getItem(int position) {
-    return filteredItem.get(position);
+  @Override public int getCount() {
+    return filteredItem.size();
   }
 
   @Override public long getItemId(int position) {
     return getItem(position).hashCode();
   }
 
+  @Override public Object getItem(int position) {
+    return filteredItem.get(position);
+  }
+
   @Override public View getView(int position, View convertView, ViewGroup parent) {
     LayoutInflater mInflater =
       (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+    Holder holder;
     if (convertView == null) {
       convertView = mInflater.inflate(layoutId, parent, false);
+      holder = new Holder(convertView);
+      convertView.setTag(holder);
+    } else {
+      holder = (Holder) convertView.getTag();
     }
-    if (convertView instanceof TextView) {
-      ((TextView) convertView).setText(presenter.getLabelOf(getItem(position), position));
-    }
+    Object item = getItem(position);
+    String label = presenter.getLabelOf(item, position);
+    String caption = null;
+    if (captionPresenter != null) caption = captionPresenter.getLabelOf(item, position);
+    holder.bind(label, caption);
+
     return convertView;
   }
 
@@ -111,6 +124,26 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
     this.isDependencyMode = isDependencyMode;
   }
 
+  private static class Holder {
+    private final TextView line1;
+    private final TextView line2;
+
+    Holder(View itemView) {
+      line1 = itemView.findViewById(R.id.spinney_item_line1);
+      line2 = itemView.findViewById(R.id.spinney_item_line2);
+    }
+
+    void bind(String line1, @Nullable String line2) {
+      this.line1.setText(line1);
+      if (line2 != null) {
+        this.line2.setText(line2);
+        this.line2.setVisibility(View.VISIBLE);
+      } else {
+        this.line2.setVisibility(View.GONE);
+      }
+    }
+  }
+
   private class FilterByLabel extends Filter {
 
     private final Locale locale = Locale.getDefault();
@@ -124,8 +157,9 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
         List<T> filteredList = new ArrayList<>();
         String query = constraint.toString().toLowerCase(locale);
         for (T item : conditionedItem) {
-          if (presenter.getLabelOf(item, 0).toLowerCase(locale).contains(query))
+          if (isFound(presenter, item, query) || isFound(captionPresenter, item, query)) {
             filteredList.add(item);
+          }
         }
         results.values = filteredList;
         results.count = filteredList.size();
@@ -133,8 +167,13 @@ public final class SpinneyAdapter<T> extends BaseAdapter implements Filterable {
       return results;
     }
 
-    @Override
-    protected void publishResults(CharSequence constraint, final FilterResults results) {
+    private boolean isFound(@Nullable ItemPresenter presenter, Object object, String query) {
+      return presenter != null && presenter.getLabelOf(object, 0)
+        .toLowerCase(locale)
+        .contains(query);
+    }
+
+    @Override protected void publishResults(CharSequence constraint, final FilterResults results) {
       filteredItem = (List<T>) results.values;
       notifyDataSetChanged();
     }

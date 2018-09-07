@@ -51,11 +51,14 @@ public class Spinney<T> extends AppCompatEditText {
   /** Internal OnItemSelectedListeners use when filterBy() was called */
   private List<OnItemSelectedListener<T>> _itemSelectedListeners = new ArrayList<>();
   private ItemPresenter itemPresenter = defaultItemPresenter;
+  private ItemPresenter itemCaptionPresenter;
   private SpinneyAdapter<T> adapter;
   private T selectedItem;
   private boolean safeMode = defaultSafeMode;
 
-  public Spinney(Context context) { this(context, null); }
+  public Spinney(Context context) {
+    this(context, null);
+  }
 
   public Spinney(Context context, AttributeSet attrs) {
     this(context, attrs, android.R.attr.editTextStyle);
@@ -103,7 +106,9 @@ public class Spinney<T> extends AppCompatEditText {
    * @param items list of item use
    */
   public final void setSearchableItem(@NonNull final List<T> items) {
-    setSearchableAdapter(new SpinneyAdapter<>(getContext(), items, itemPresenter));
+    SpinneyAdapter<T> adapter = new SpinneyAdapter<>(getContext(), items, itemPresenter);
+    adapter.setCaptionPresenter(itemCaptionPresenter);
+    setSearchableAdapter(adapter);
   }
 
   /**
@@ -136,8 +141,9 @@ public class Spinney<T> extends AppCompatEditText {
       setText(itemPresenter.getLabelOf(item, selectedIndex));
       for (OnItemSelectedListener _listener : _itemSelectedListeners)
         _listener.onItemSelected(Spinney.this, item, selectedIndex);
-      if (itemSelectedListener != null)
+      if (itemSelectedListener != null) {
         itemSelectedListener.onItemSelected(Spinney.this, item, selectedIndex);
+      }
     }
   }
 
@@ -159,6 +165,7 @@ public class Spinney<T> extends AppCompatEditText {
    */
   public final void setItems(@NonNull final List<T> items) {
     adapter = new SpinneyAdapter<>(getContext(), items, itemPresenter);
+    adapter.setCaptionPresenter(itemCaptionPresenter);
     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
     builder.setTitle(getHint() != null ? getHint() : hint);
     builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
@@ -213,7 +220,27 @@ public class Spinney<T> extends AppCompatEditText {
   }
 
   /** @return selected item, this may be null */
-  @Nullable public final T getSelectedItem() { return selectedItem; }
+  @Nullable public final T getSelectedItem() {
+    return selectedItem;
+  }
+
+  /**
+   * Must call after adapter or item have already set also after call <code>filterBy</code>
+   *
+   * @param item to set as selected item
+   * @throws IllegalArgumentException if not found item in adapter of spinney, enableSafeMode() to
+   * disable this exception. safeMode is disable by default
+   */
+  public final void setSelectedItem(@Nullable T item) {
+    if (adapter == null) {
+      throw new IllegalStateException("Must set adapter or item before call this");
+    }
+
+    int positionOf = adapter.findPositionOf(item);
+    if (positionOf >= 0) {
+      whenItemSelected(item, positionOf);
+    } else if (!safeMode) throw new IllegalArgumentException("Not found specify item");
+  }
 
   /**
    * @return check that spinney have item to select or have nothing by filter
@@ -234,33 +261,19 @@ public class Spinney<T> extends AppCompatEditText {
     setLongClickable(false);
   }
 
-  /**
-   * Must call after adapter or item have already set also after call <code>filterBy</code>
-   *
-   * @param item to set as selected item
-   * @throws IllegalArgumentException if not found item in adapter of spinney, enableSafeMode() to
-   * disable this exception. safeMode is disable by default
-   */
-  public final void setSelectedItem(@Nullable T item) {
-    if (adapter == null)
-      throw new IllegalStateException("Must set adapter or item before call this");
-
-    int positionOf = adapter.findPositionOf(item);
-    if (positionOf >= 0)
-      whenItemSelected(item, positionOf);
-    else if (!safeMode)
-      throw new IllegalArgumentException("Not found specify item");
-  }
-
   /** @return position of selected item, -1 is nothing select */
-  public final int getSelectedItemPosition() { return adapter.findPositionOf(selectedItem); }
+  public final int getSelectedItemPosition() {
+    return adapter.findPositionOf(selectedItem);
+  }
 
   /**
    * This getter may help if you really need it. By the way, Use with CAUTION!
    *
    * @return SpinneyAdapter currently use by Spinney
    */
-  public final SpinneyAdapter<T> getAdapter() { return adapter; }
+  public final SpinneyAdapter<T> getAdapter() {
+    return adapter;
+  }
 
   /**
    * ItemPresenter to use only on instance of Spinney. Spinney will use global presenter if this not
@@ -273,10 +286,13 @@ public class Spinney<T> extends AppCompatEditText {
     this.itemPresenter = itemPresenter;
   }
 
+  public final void setItemCaptionPresenter(@NonNull ItemPresenter<T> itemPresenter) {
+    this.itemCaptionPresenter = itemPresenter;
+  }
+
   /** @param itemSelectedListener to callback when item was selected */
   public final void setOnItemSelectedListener(
-    @NonNull OnItemSelectedListener<T> itemSelectedListener)
-  {
+    @NonNull OnItemSelectedListener<T> itemSelectedListener) {
     this.itemSelectedListener = itemSelectedListener;
   }
 

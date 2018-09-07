@@ -30,8 +30,9 @@ import me.piruin.spinney.Spinney;
 
 public class BasicFragment extends Fragment {
 
-  @BindView(R.id.spinney_searchable) Spinney<String> searchableDept;
-  @BindView(R.id.spinney_normal) Spinney<String> normalDept;
+  @BindView(R.id.spinney_searchable) Spinney<String> searchable;
+  @BindView(R.id.spinney_normal) Spinney<String> normal;
+  @BindView(R.id.spinney_typeItem) Spinney<DatabaseItem> typeItem;
 
   @Nullable @Override public View onCreateView(
     @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -45,13 +46,25 @@ public class BasicFragment extends Fragment {
   @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
 
-    normalDept.setItems(Data.department);
+    normal.setItems(Data.department);
 
-    searchableDept.setSearchableItem(Data.department);
-    searchableDept.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
+    searchable.setSearchableItem(Data.department);
+    searchable.setOnItemSelectedListener(new Spinney.OnItemSelectedListener<String>() {
       @Override public void onItemSelected(Spinney view, String selectedItem, int position) {
-        normalDept.clearSelection();
+        normal.clearSelection();
       }
     });
+
+    typeItem.setItemPresenter(new Spinney.ItemPresenter<DatabaseItem>() {
+      @Override public String getLabelOf(DatabaseItem item, int position) {
+        return item.getName();
+      }
+    });
+    typeItem.setItemCaptionPresenter(new Spinney.ItemPresenter<DatabaseItem>() {
+      @Override public String getLabelOf(DatabaseItem item, int position) {
+        return item.getParentId() + "-" + item.getId();
+      }
+    });
+    typeItem.setSearchableItem(Data.cities);
   }
 }

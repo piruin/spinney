@@ -2,4 +2,5 @@
   <string name="app_name">Spinney</string>
   <string name="searchable">Searchable</string>
   <string name="normal">Normal</string>
+  <string name="type_item">Type Item</string>
 </resources>
